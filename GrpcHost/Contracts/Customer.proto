@@ -1,0 +1,23 @@
+﻿syntax = "proto3";
+
+package google.protobuf;
+
+option csharp_namespace = "Contracts";
+
+service CustomerService { 
+  rpc GetCustomerById(GetCustomerByIdRequest) returns (GetCustomerByIdResponse) { }
+}
+
+message GetCustomerByIdRequest {
+	int32 id = 1;
+}
+
+message GetCustomerByIdResponse {
+	Customer Customer = 1;
+}
+
+message Customer {
+	int32 id = 1;
+	string firstName = 2;
+    string lastName = 3;
+}

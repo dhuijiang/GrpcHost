@@ -1,0 +1,11 @@
+version: '3.4'
+
+services:
+  grpcserver:
+    image: grpcserver
+    build:
+      context: .
+      dockerfile: GrpcApp/Dockerfile
+
+volumes:
+  portainer_data:

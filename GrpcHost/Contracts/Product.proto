@@ -1,0 +1,26 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Contracts";
+package google.protobuf;
+
+import "google/protobuf/timestamp.proto";
+
+service ProductService { 
+  rpc GetProductForCustomer(GetProductsForCustomerRequest) returns (GetProductsForCustomerResponse) {}
+}
+
+message GetProductsForCustomerRequest {
+	int32 customerId = 1;
+}
+
+message GetProductsForCustomerResponse {
+	repeated Product Products = 1;
+}
+
+message Product {
+	int32 id = 1;
+	string name = 2;
+	float price = 3;
+	int32 quantity = 4;
+	google.protobuf.Timestamp createdAt = 5;
+}
