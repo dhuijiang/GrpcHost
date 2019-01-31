@@ -9,7 +9,7 @@ using Grpc.HealthCheck;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Grpc.Core.Interceptors;
-using Microsoft.Extensions.Hosting.GrpcHost.Interceptors;
+
 namespace GrpcHost
 {
     public class GrpcServer : Server
@@ -37,11 +37,10 @@ namespace GrpcHost
 
             _healthServiceImpl.SetStatus(descriptor.Service.FullName, HealthCheckResponse.Types.ServingStatus.Serving);
 
-
             return this;
         }
 
-        private static Method<TRequest, TResponse> CreateMethod<TRequest, TResponse>(MethodDescriptor descriptor) where TRequest : IMessage<TRequest> where TResponse : IMessage<TResponse>
+        private static Method<TRequest, TResponse> CreateMethod<TRequest, TResponse>(MethodDescriptor descriptor)
         {
             return
                 new Method<TRequest, TResponse>(
@@ -51,9 +50,10 @@ namespace GrpcHost
                     CreateMarshaller<TRequest>(descriptor.InputType.Parser),
                     CreateMarshaller<TResponse>(descriptor.OutputType.Parser));
 
-            Marshaller<TContract> CreateMarshaller<TContract>(MessageParser parser) where TContract : IMessage<TContract>
+            //MessageParser<GetCustomerByIdRequest>(() => new GetCustomerByIdRequest()
+            Marshaller<T> CreateMarshaller<T>(MessageParser parser)
             {
-                return Marshallers.Create<TContract>(x => x.ToByteArray(), d => (TContract)parser.ParseFrom(d));
+                return Marshallers.Create(x => ((IMessage)x).ToByteArray(), d => (T)parser.ParseFrom(d));
             }
         }
     }
