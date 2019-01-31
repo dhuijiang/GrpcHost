@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using GrpcHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -17,26 +18,19 @@ namespace Microsoft.Extensions.Hosting.GrpcHost
                 {
                     configHost.SetBasePath(Directory.GetCurrentDirectory());
                     configHost.AddJsonFile("hostsettings.json", optional: true);
-                    configHost.AddEnvironmentVariables(prefix: "PREFIX_");
-                    configHost.AddCommandLine(args);
                 })
                 .ConfigureAppConfiguration((hostContext, configApp) =>
                 {
-                    configApp.AddJsonFile("appsettings.json", optional: true);
-                    configApp.AddJsonFile(
-                        $"appsettings.{hostContext.HostingEnvironment.EnvironmentName}.json",
-                        optional: true);
-                    configApp.AddEnvironmentVariables(prefix: "PREFIX_");
                     configApp.AddCommandLine(args);
                 })
                 .ConfigureLogging((hostContext, configLogging) =>
                 {
                     configLogging.AddConsole();
-                    //configLogging.AddDebug();
                 })
                 .ConfigureServices(svcs =>
                 {
                     svcs.AddLogging();
+                    svcs.AddHostedService<GrpcHostedService>();
                 })
                 .ConfigureServices(configureServices)
                 .UseConsoleLifetime()

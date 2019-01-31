@@ -9,7 +9,7 @@ namespace Microsoft.Extensions.Hosting.GrpcHost.Interceptors
     {
         private readonly ILogger _logger;
 
-        public ExceptionInterceptor(ILogger logger)
+        public ExceptionInterceptor(ILogger<ExceptionInterceptor> logger)
         {
             _logger = logger;
         }
