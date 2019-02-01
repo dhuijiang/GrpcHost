@@ -3,7 +3,7 @@ using Grpc.Core;
 using Grpc.Core.Interceptors;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.Extensions.Hosting.GrpcHost.Interceptors
+namespace GrpcHost.Interceptors
 {
     public class ExceptionInterceptor : Interceptor
     {

@@ -1,11 +1,11 @@
 ﻿using System;
 using System.IO;
-using GrpcHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.Extensions.Hosting.GrpcHost
+namespace GrpcHost
 {
     public static class GrpcHostBuilder
     {
@@ -31,6 +31,8 @@ namespace Microsoft.Extensions.Hosting.GrpcHost
                 {
                     svcs.AddLogging();
                     svcs.AddHostedService<GrpcHostedService>();
+                    svcs.AddServiceDefiners();
+                    svcs.AddSingleton<GrpcServer>();
                 })
                 .ConfigureServices(configureServices)
                 .UseConsoleLifetime()

@@ -15,14 +15,14 @@ namespace GrpcClient
             var healthResponse = await healthClient.CheckAsync(new HealthCheckRequest());
             Console.WriteLine($"Server is: {healthResponse.Status}");
 
-            healthResponse = await healthClient.CheckAsync(new HealthCheckRequest { Service = "CustomerService" });
+            healthResponse = await healthClient.CheckAsync(new HealthCheckRequest { Service = Contracts.CustomerService.Descriptor.FullName });
             Console.WriteLine($"CustomerService is: {healthResponse.Status}");
 
             var customerClient = new CustomerService.CustomerServiceClient(channel);
             var customerResponse = await customerClient.GetCustomerByIdAsync(new GetCustomerByIdRequest { Id = 1 });
             Console.WriteLine($"Customer: {customerResponse.Customer.Id} retrieved.");
 
-            healthResponse = await healthClient.CheckAsync(new HealthCheckRequest { Service = "ProductService" });
+            healthResponse = await healthClient.CheckAsync(new HealthCheckRequest { Service = Contracts.ProductService.Descriptor.FullName });
             Console.WriteLine($"ProductService is: {healthResponse.Status}");
 
             var productClient = new ProductService.ProductServiceClient(channel);

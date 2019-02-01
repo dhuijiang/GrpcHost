@@ -1,63 +1,11 @@
 ﻿using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Google.Protobuf;
-using Google.Protobuf.Reflection;
-using Grpc.Core;
-using Grpc.Health.V1;
-using Grpc.HealthCheck;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Grpc.Core.Interceptors;
 
 namespace GrpcHost
 {
-    public class GrpcServer : Server
-    {
-        private readonly HealthServiceImpl _healthServiceImpl = new HealthServiceImpl();
-
-        public GrpcServer()
-        {
-            Ports.Add("localhost", 5000, ServerCredentials.Insecure);
-
-            _healthServiceImpl.SetStatus("", HealthCheckResponse.Types.ServingStatus.Serving);
-            Services.Add(Health.BindService(_healthServiceImpl));
-        }
-
-        public GrpcServer InjectImplementation<TRequest, TResponse>(MethodDescriptor descriptor, UnaryServerMethod<TRequest, TResponse> handler, params Interceptor[] interceptors)
-            where TRequest : class, IMessage<TRequest>
-            where TResponse : class, IMessage<TResponse>
-        {
-            var definition = ServerServiceDefinition.CreateBuilder().AddMethod(CreateMethod<TRequest, TResponse>(descriptor), handler).Build();
-
-            if(interceptors != null)
-                definition = definition.Intercept(interceptors);
-
-            Services.Add(definition);
-
-            _healthServiceImpl.SetStatus(descriptor.Service.FullName, HealthCheckResponse.Types.ServingStatus.Serving);
-
-            return this;
-        }
-
-        private static Method<TRequest, TResponse> CreateMethod<TRequest, TResponse>(MethodDescriptor descriptor)
-        {
-            return
-                new Method<TRequest, TResponse>(
-                    MethodType.Unary,
-                    descriptor.Service.FullName,
-                    descriptor.Name,
-                    CreateMarshaller<TRequest>(descriptor.InputType.Parser),
-                    CreateMarshaller<TResponse>(descriptor.OutputType.Parser));
-
-            //MessageParser<GetCustomerByIdRequest>(() => new GetCustomerByIdRequest()
-            Marshaller<T> CreateMarshaller<T>(MessageParser parser)
-            {
-                return Marshallers.Create(x => ((IMessage)x).ToByteArray(), d => (T)parser.ParseFrom(d));
-            }
-        }
-    }
-
     public class GrpcHostedService : IHostedService
     {
         private readonly GrpcServer _server;

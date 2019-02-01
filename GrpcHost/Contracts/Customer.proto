@@ -5,7 +5,10 @@ package google.protobuf;
 option csharp_namespace = "Contracts";
 
 service CustomerService { 
-  rpc GetCustomerById(GetCustomerByIdRequest) returns (GetCustomerByIdResponse) { }
+	rpc GetCustomerById(GetCustomerByIdRequest) returns (GetCustomerByIdResponse) { }
+	rpc DeleteCustomerById(DeleteCustomerByIdRequest) returns (DeleteCustomerByIdResponse) {}
+
+	rpc ListCustomers(CustomerSearch) returns (stream Customer) {}
 }
 
 message GetCustomerByIdRequest {
@@ -16,8 +19,19 @@ message GetCustomerByIdResponse {
 	Customer Customer = 1;
 }
 
+message CustomerSearch {
+	string firstName = 1;
+}
+
 message Customer {
 	int32 id = 1;
 	string firstName = 2;
     string lastName = 3;
+}
+
+message DeleteCustomerByIdRequest {
+	int32  id = 1;
+}
+
+message DeleteCustomerByIdResponse {
 }

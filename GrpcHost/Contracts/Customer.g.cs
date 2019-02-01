@@ -27,17 +27,27 @@ namespace Contracts {
             "Cg5DdXN0b21lci5wcm90bxIPZ29vZ2xlLnByb3RvYnVmIiQKFkdldEN1c3Rv",
             "bWVyQnlJZFJlcXVlc3QSCgoCaWQYASABKAUiRgoXR2V0Q3VzdG9tZXJCeUlk",
             "UmVzcG9uc2USKwoIQ3VzdG9tZXIYASABKAsyGS5nb29nbGUucHJvdG9idWYu",
-            "Q3VzdG9tZXIiOwoIQ3VzdG9tZXISCgoCaWQYASABKAUSEQoJZmlyc3ROYW1l",
-            "GAIgASgJEhAKCGxhc3ROYW1lGAMgASgJMnkKD0N1c3RvbWVyU2VydmljZRJm",
-            "Cg9HZXRDdXN0b21lckJ5SWQSJy5nb29nbGUucHJvdG9idWYuR2V0Q3VzdG9t",
-            "ZXJCeUlkUmVxdWVzdBooLmdvb2dsZS5wcm90b2J1Zi5HZXRDdXN0b21lckJ5",
-            "SWRSZXNwb25zZSIAQgyqAglDb250cmFjdHNiBnByb3RvMw=="));
+            "Q3VzdG9tZXIiIwoOQ3VzdG9tZXJTZWFyY2gSEQoJZmlyc3ROYW1lGAEgASgJ",
+            "IjsKCEN1c3RvbWVyEgoKAmlkGAEgASgFEhEKCWZpcnN0TmFtZRgCIAEoCRIQ",
+            "CghsYXN0TmFtZRgDIAEoCSInChlEZWxldGVDdXN0b21lckJ5SWRSZXF1ZXN0",
+            "EgoKAmlkGAEgASgFIhwKGkRlbGV0ZUN1c3RvbWVyQnlJZFJlc3BvbnNlMrsC",
+            "Cg9DdXN0b21lclNlcnZpY2USZgoPR2V0Q3VzdG9tZXJCeUlkEicuZ29vZ2xl",
+            "LnByb3RvYnVmLkdldEN1c3RvbWVyQnlJZFJlcXVlc3QaKC5nb29nbGUucHJv",
+            "dG9idWYuR2V0Q3VzdG9tZXJCeUlkUmVzcG9uc2UiABJvChJEZWxldGVDdXN0",
+            "b21lckJ5SWQSKi5nb29nbGUucHJvdG9idWYuRGVsZXRlQ3VzdG9tZXJCeUlk",
+            "UmVxdWVzdBorLmdvb2dsZS5wcm90b2J1Zi5EZWxldGVDdXN0b21lckJ5SWRS",
+            "ZXNwb25zZSIAEk8KDUxpc3RDdXN0b21lcnMSHy5nb29nbGUucHJvdG9idWYu",
+            "Q3VzdG9tZXJTZWFyY2gaGS5nb29nbGUucHJvdG9idWYuQ3VzdG9tZXIiADAB",
+            "QgyqAglDb250cmFjdHNiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Contracts.GetCustomerByIdRequest), global::Contracts.GetCustomerByIdRequest.Parser, new[]{ "Id" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Contracts.GetCustomerByIdResponse), global::Contracts.GetCustomerByIdResponse.Parser, new[]{ "Customer" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Contracts.Customer), global::Contracts.Customer.Parser, new[]{ "Id", "FirstName", "LastName" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Contracts.CustomerSearch), global::Contracts.CustomerSearch.Parser, new[]{ "FirstName" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Contracts.Customer), global::Contracts.Customer.Parser, new[]{ "Id", "FirstName", "LastName" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Contracts.DeleteCustomerByIdRequest), global::Contracts.DeleteCustomerByIdRequest.Parser, new[]{ "Id" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Contracts.DeleteCustomerByIdResponse), global::Contracts.DeleteCustomerByIdResponse.Parser, null, null, null, null)
           }));
     }
     #endregion
@@ -308,6 +318,135 @@ namespace Contracts {
 
   }
 
+  public sealed partial class CustomerSearch : pb::IMessage<CustomerSearch> {
+    private static readonly pb::MessageParser<CustomerSearch> _parser = new pb::MessageParser<CustomerSearch>(() => new CustomerSearch());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<CustomerSearch> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Contracts.CustomerReflection.Descriptor.MessageTypes[2]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public CustomerSearch() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public CustomerSearch(CustomerSearch other) : this() {
+      firstName_ = other.firstName_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public CustomerSearch Clone() {
+      return new CustomerSearch(this);
+    }
+
+    /// <summary>Field number for the "firstName" field.</summary>
+    public const int FirstNameFieldNumber = 1;
+    private string firstName_ = "";
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public string FirstName {
+      get { return firstName_; }
+      set {
+        firstName_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as CustomerSearch);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(CustomerSearch other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (FirstName != other.FirstName) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (FirstName.Length != 0) hash ^= FirstName.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+      if (FirstName.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(FirstName);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      if (FirstName.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(FirstName);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(CustomerSearch other) {
+      if (other == null) {
+        return;
+      }
+      if (other.FirstName.Length != 0) {
+        FirstName = other.FirstName;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 10: {
+            FirstName = input.ReadString();
+            break;
+          }
+        }
+      }
+    }
+
+  }
+
   public sealed partial class Customer : pb::IMessage<Customer> {
     private static readonly pb::MessageParser<Customer> _parser = new pb::MessageParser<Customer>(() => new Customer());
     private pb::UnknownFieldSet _unknownFields;
@@ -316,7 +455,7 @@ namespace Contracts {
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Contracts.CustomerReflection.Descriptor.MessageTypes[2]; }
+      get { return global::Contracts.CustomerReflection.Descriptor.MessageTypes[3]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -487,6 +626,236 @@ namespace Contracts {
             LastName = input.ReadString();
             break;
           }
+        }
+      }
+    }
+
+  }
+
+  public sealed partial class DeleteCustomerByIdRequest : pb::IMessage<DeleteCustomerByIdRequest> {
+    private static readonly pb::MessageParser<DeleteCustomerByIdRequest> _parser = new pb::MessageParser<DeleteCustomerByIdRequest>(() => new DeleteCustomerByIdRequest());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<DeleteCustomerByIdRequest> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Contracts.CustomerReflection.Descriptor.MessageTypes[4]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public DeleteCustomerByIdRequest() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public DeleteCustomerByIdRequest(DeleteCustomerByIdRequest other) : this() {
+      id_ = other.id_;
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public DeleteCustomerByIdRequest Clone() {
+      return new DeleteCustomerByIdRequest(this);
+    }
+
+    /// <summary>Field number for the "id" field.</summary>
+    public const int IdFieldNumber = 1;
+    private int id_;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int Id {
+      get { return id_; }
+      set {
+        id_ = value;
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as DeleteCustomerByIdRequest);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(DeleteCustomerByIdRequest other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      if (Id != other.Id) return false;
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (Id != 0) hash ^= Id.GetHashCode();
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+      if (Id != 0) {
+        output.WriteRawTag(8);
+        output.WriteInt32(Id);
+      }
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      if (Id != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeInt32Size(Id);
+      }
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(DeleteCustomerByIdRequest other) {
+      if (other == null) {
+        return;
+      }
+      if (other.Id != 0) {
+        Id = other.Id;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
+          case 8: {
+            Id = input.ReadInt32();
+            break;
+          }
+        }
+      }
+    }
+
+  }
+
+  public sealed partial class DeleteCustomerByIdResponse : pb::IMessage<DeleteCustomerByIdResponse> {
+    private static readonly pb::MessageParser<DeleteCustomerByIdResponse> _parser = new pb::MessageParser<DeleteCustomerByIdResponse>(() => new DeleteCustomerByIdResponse());
+    private pb::UnknownFieldSet _unknownFields;
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pb::MessageParser<DeleteCustomerByIdResponse> Parser { get { return _parser; } }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public static pbr::MessageDescriptor Descriptor {
+      get { return global::Contracts.CustomerReflection.Descriptor.MessageTypes[5]; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    pbr::MessageDescriptor pb::IMessage.Descriptor {
+      get { return Descriptor; }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public DeleteCustomerByIdResponse() {
+      OnConstruction();
+    }
+
+    partial void OnConstruction();
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public DeleteCustomerByIdResponse(DeleteCustomerByIdResponse other) : this() {
+      _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public DeleteCustomerByIdResponse Clone() {
+      return new DeleteCustomerByIdResponse(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override bool Equals(object other) {
+      return Equals(other as DeleteCustomerByIdResponse);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public bool Equals(DeleteCustomerByIdResponse other) {
+      if (ReferenceEquals(other, null)) {
+        return false;
+      }
+      if (ReferenceEquals(other, this)) {
+        return true;
+      }
+      return Equals(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override int GetHashCode() {
+      int hash = 1;
+      if (_unknownFields != null) {
+        hash ^= _unknownFields.GetHashCode();
+      }
+      return hash;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public override string ToString() {
+      return pb::JsonFormatter.ToDiagnosticString(this);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void WriteTo(pb::CodedOutputStream output) {
+      if (_unknownFields != null) {
+        _unknownFields.WriteTo(output);
+      }
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public int CalculateSize() {
+      int size = 0;
+      if (_unknownFields != null) {
+        size += _unknownFields.CalculateSize();
+      }
+      return size;
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(DeleteCustomerByIdResponse other) {
+      if (other == null) {
+        return;
+      }
+      _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
+    }
+
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    public void MergeFrom(pb::CodedInputStream input) {
+      uint tag;
+      while ((tag = input.ReadTag()) != 0) {
+        switch(tag) {
+          default:
+            _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
+            break;
         }
       }
     }

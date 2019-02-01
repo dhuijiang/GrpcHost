@@ -14,6 +14,10 @@ namespace Contracts {
 
     static readonly grpc::Marshaller<global::Contracts.GetCustomerByIdRequest> __Marshaller_google_protobuf_GetCustomerByIdRequest = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Contracts.GetCustomerByIdRequest.Parser.ParseFrom);
     static readonly grpc::Marshaller<global::Contracts.GetCustomerByIdResponse> __Marshaller_google_protobuf_GetCustomerByIdResponse = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Contracts.GetCustomerByIdResponse.Parser.ParseFrom);
+    static readonly grpc::Marshaller<global::Contracts.DeleteCustomerByIdRequest> __Marshaller_google_protobuf_DeleteCustomerByIdRequest = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Contracts.DeleteCustomerByIdRequest.Parser.ParseFrom);
+    static readonly grpc::Marshaller<global::Contracts.DeleteCustomerByIdResponse> __Marshaller_google_protobuf_DeleteCustomerByIdResponse = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Contracts.DeleteCustomerByIdResponse.Parser.ParseFrom);
+    static readonly grpc::Marshaller<global::Contracts.CustomerSearch> __Marshaller_google_protobuf_CustomerSearch = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Contracts.CustomerSearch.Parser.ParseFrom);
+    static readonly grpc::Marshaller<global::Contracts.Customer> __Marshaller_google_protobuf_Customer = grpc::Marshallers.Create((arg) => global::Google.Protobuf.MessageExtensions.ToByteArray(arg), global::Contracts.Customer.Parser.ParseFrom);
 
     static readonly grpc::Method<global::Contracts.GetCustomerByIdRequest, global::Contracts.GetCustomerByIdResponse> __Method_GetCustomerById = new grpc::Method<global::Contracts.GetCustomerByIdRequest, global::Contracts.GetCustomerByIdResponse>(
         grpc::MethodType.Unary,
@@ -21,6 +25,20 @@ namespace Contracts {
         "GetCustomerById",
         __Marshaller_google_protobuf_GetCustomerByIdRequest,
         __Marshaller_google_protobuf_GetCustomerByIdResponse);
+
+    static readonly grpc::Method<global::Contracts.DeleteCustomerByIdRequest, global::Contracts.DeleteCustomerByIdResponse> __Method_DeleteCustomerById = new grpc::Method<global::Contracts.DeleteCustomerByIdRequest, global::Contracts.DeleteCustomerByIdResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "DeleteCustomerById",
+        __Marshaller_google_protobuf_DeleteCustomerByIdRequest,
+        __Marshaller_google_protobuf_DeleteCustomerByIdResponse);
+
+    static readonly grpc::Method<global::Contracts.CustomerSearch, global::Contracts.Customer> __Method_ListCustomers = new grpc::Method<global::Contracts.CustomerSearch, global::Contracts.Customer>(
+        grpc::MethodType.ServerStreaming,
+        __ServiceName,
+        "ListCustomers",
+        __Marshaller_google_protobuf_CustomerSearch,
+        __Marshaller_google_protobuf_Customer);
 
     /// <summary>Service descriptor</summary>
     public static global::Google.Protobuf.Reflection.ServiceDescriptor Descriptor
@@ -32,6 +50,16 @@ namespace Contracts {
     public abstract partial class CustomerServiceBase
     {
       public virtual global::System.Threading.Tasks.Task<global::Contracts.GetCustomerByIdResponse> GetCustomerById(global::Contracts.GetCustomerByIdRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      public virtual global::System.Threading.Tasks.Task<global::Contracts.DeleteCustomerByIdResponse> DeleteCustomerById(global::Contracts.DeleteCustomerByIdRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      public virtual global::System.Threading.Tasks.Task ListCustomers(global::Contracts.CustomerSearch request, grpc::IServerStreamWriter<global::Contracts.Customer> responseStream, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -77,6 +105,30 @@ namespace Contracts {
       {
         return CallInvoker.AsyncUnaryCall(__Method_GetCustomerById, null, options, request);
       }
+      public virtual global::Contracts.DeleteCustomerByIdResponse DeleteCustomerById(global::Contracts.DeleteCustomerByIdRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DeleteCustomerById(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      public virtual global::Contracts.DeleteCustomerByIdResponse DeleteCustomerById(global::Contracts.DeleteCustomerByIdRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_DeleteCustomerById, null, options, request);
+      }
+      public virtual grpc::AsyncUnaryCall<global::Contracts.DeleteCustomerByIdResponse> DeleteCustomerByIdAsync(global::Contracts.DeleteCustomerByIdRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return DeleteCustomerByIdAsync(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      public virtual grpc::AsyncUnaryCall<global::Contracts.DeleteCustomerByIdResponse> DeleteCustomerByIdAsync(global::Contracts.DeleteCustomerByIdRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_DeleteCustomerById, null, options, request);
+      }
+      public virtual grpc::AsyncServerStreamingCall<global::Contracts.Customer> ListCustomers(global::Contracts.CustomerSearch request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return ListCustomers(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      public virtual grpc::AsyncServerStreamingCall<global::Contracts.Customer> ListCustomers(global::Contracts.CustomerSearch request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncServerStreamingCall(__Method_ListCustomers, null, options, request);
+      }
       /// <summary>Creates a new instance of client from given <c>ClientBaseConfiguration</c>.</summary>
       protected override CustomerServiceClient NewInstance(ClientBaseConfiguration configuration)
       {
@@ -89,7 +141,9 @@ namespace Contracts {
     public static grpc::ServerServiceDefinition BindService(CustomerServiceBase serviceImpl)
     {
       return grpc::ServerServiceDefinition.CreateBuilder()
-          .AddMethod(__Method_GetCustomerById, serviceImpl.GetCustomerById).Build();
+          .AddMethod(__Method_GetCustomerById, serviceImpl.GetCustomerById)
+          .AddMethod(__Method_DeleteCustomerById, serviceImpl.DeleteCustomerById)
+          .AddMethod(__Method_ListCustomers, serviceImpl.ListCustomers).Build();
     }
 
     /// <summary>Register service method implementations with a service binder. Useful when customizing the service binding logic.
@@ -99,6 +153,8 @@ namespace Contracts {
     public static void BindService(grpc::ServiceBinderBase serviceBinder, CustomerServiceBase serviceImpl)
     {
       serviceBinder.AddMethod(__Method_GetCustomerById, serviceImpl.GetCustomerById);
+      serviceBinder.AddMethod(__Method_DeleteCustomerById, serviceImpl.DeleteCustomerById);
+      serviceBinder.AddMethod(__Method_ListCustomers, serviceImpl.ListCustomers);
     }
 
   }
