@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using Grpc.Core;
 using Grpc.Health.V1;
 using Grpc.HealthCheck;
@@ -8,21 +10,22 @@ namespace GrpcHost
 {
     public class GrpcServer : Server
     {
-        private readonly ServiceDefinerOptions _options;
+        private readonly ServerServiceDefinition _definition;
         private readonly HealthServiceImpl _healthServiceImpl = new HealthServiceImpl();
 
-        public GrpcServer(IOptions<ServiceDefinerOptions> options)
+        public GrpcServer(ServerServiceDefinition definition)
         {
-            _options = options.Value ?? throw new ArgumentNullException(nameof(options));
+            _definition = definition;
         }
 
         public new void Start()
         {
-            foreach(var definer in _options.Definers)
-            {
-                Services.Add(definer.Definition);
-                _healthServiceImpl.SetStatus(definer.ServiceName, HealthCheckResponse.Types.ServingStatus.Serving);
-            }
+            Services.Add(_definition);
+            //foreach(var definer in _definition)
+            //{
+            //    Services.Add(definer);
+            //    //_healthServiceImpl.SetStatus(definer.ServiceName, HealthCheckResponse.Types.ServingStatus.Serving);
+            //}
 
             // TODO: Move to options.
             Ports.Add("localhost", 5000, ServerCredentials.Insecure);

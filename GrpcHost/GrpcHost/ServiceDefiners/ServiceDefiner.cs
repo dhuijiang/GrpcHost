@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading.Tasks;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
@@ -17,6 +20,55 @@ namespace GrpcHost
             services.Configure<ServiceDefinerOptions>(x => x.Definers.AddRange(services.BuildServiceProvider().GetServices<IServiceDefiner>()));
 
             return services;
+        }
+
+        public static Func<TService, ServerServiceDefinition> GetServiceBinder<TService>()
+        {
+            var serviceType = typeof(TService);
+            var baseServiceType = GetBaseType(serviceType);
+            var serviceDefinitionType = typeof(ServerServiceDefinition);
+
+            var serviceContainerType = baseServiceType.DeclaringType;
+            var methods = serviceContainerType.GetMethods(BindingFlags.Public | BindingFlags.Static);
+
+            var binder =
+                (from m in methods
+                 let parameters = m.GetParameters()
+                 where m.Name.Equals("BindService") && parameters.Length == 1 && parameters.First()
+                 .ParameterType.Equals(baseServiceType) && m.ReturnType.Equals(serviceDefinitionType)
+                 select m)
+            .SingleOrDefault();
+
+            if (binder == null)
+            {
+                throw new InvalidOperationException($"Could not find service binder for provided service {serviceType.Name}");
+            }
+
+            var serviceParameter = Expression.Parameter(serviceType);
+
+            var invocation = Expression.Call(null, binder, new[] { serviceParameter });
+
+            var func =
+                Expression.Lambda<Func<TService, ServerServiceDefinition>>(
+                    invocation,
+                    false,
+                    new[] { serviceParameter })
+                .Compile();
+
+            return func;
+
+            Type GetBaseType(Type type)
+            {
+                var objectType = typeof(object);
+                var baseType = type;
+
+                while (!baseType.BaseType.Equals(objectType))
+                {
+                    baseType = baseType.BaseType;
+                }
+
+                return baseType;
+            }
         }
     }
 
