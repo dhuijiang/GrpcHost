@@ -31,7 +31,13 @@ namespace GrpcHost
                 {
                     svcs.AddLogging();
                     svcs.AddHostedService<GrpcHostedService>();
-                    svcs.AddServiceDefiners();
+                    svcs.Configure<GrpcServerOptions>(o =>
+                    {
+                        using (var provider = svcs.BuildServiceProvider())
+                        {
+                            o.Definers.AddRange(provider.GetServices<IMethodContext>());
+                        }
+                    });
                     svcs.AddSingleton<GrpcServer>();
                 })
                 .ConfigureServices(configureServices)

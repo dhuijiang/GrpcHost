@@ -1,14 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
+using System.Linq.Expressions;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading.Tasks;
 using Contracts;
 using CustomerGrpcService;
-using Google.Protobuf;
 using Grpc.Core;
 using GrpcHost;
 using GrpcHost.Interceptors;
-using GrpcHost.ServiceDefiners;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Services;
@@ -19,36 +18,33 @@ namespace GrpcServer
     {
         private static async Task Main(string[] args)
         {
-            ;
             await
                 GrpcHostBuilder.BuildHost(args, (ctx, svcs) =>
                 {
                     svcs.AddSingleton<HttpClient>();
                     svcs.AddTransient<ICustomerService, Services.CustomerService>();
 
-                    svcs.AddSingleton<ServerServiceDefinition>((x) => 
-                        ServiceDefinerExtensions.GetServiceBinder<CustomerServiceImpl>()
-                       (ActivatorUtilities.GetServiceOrCreateInstance<CustomerServiceImpl>(x)));
+                    svcs.AddSingleton<IMethodContext>(
+                        x =>
+                            new MethodContext<GetCustomerByIdRequest, GetCustomerByIdResponse, CustomerServiceImpl>(
+                                MethodType.Unary,
+                                "GetCustomerById",
+                                ActivatorUtilities.GetServiceOrCreateInstance<CustomerServiceImpl>(x),
+                                ActivatorUtilities.GetServiceOrCreateInstance<ExceptionInterceptor>(x)));
 
+                    svcs.AddSingleton<IMethodContext>(
+                        x =>
+                            new MethodContext<DeleteCustomerByIdRequest, DeleteCustomerByIdResponse, CustomerServiceImpl>(
+                                MethodType.Unary,
+                                "DeleteCustomerById",
+                                ActivatorUtilities.GetServiceOrCreateInstance<CustomerServiceImpl>(x)));
 
-                    //svcs.AddSingleton<IServiceDefiner>(
-                    //    x =>
-                    //        new UnaryServiceDefiner<GetCustomerByIdRequest, GetCustomerByIdResponse>(
-                    //            Contracts.CustomerService.Descriptor.FindMethodByName("GetCustomerById"),
-                    //            ActivatorUtilities.GetServiceOrCreateInstance<CustomerServiceImpl>(x).GetCustomerById,
-                    //            ActivatorUtilities.GetServiceOrCreateInstance<ExceptionInterceptor>(x)));
-
-                    //svcs.AddSingleton<IServiceDefiner>(
-                    //    x =>
-                    //        new UnaryServiceDefiner<DeleteCustomerByIdRequest, DeleteCustomerByIdResponse>(
-                    //            Contracts.CustomerService.Descriptor.FindMethodByName("DeleteCustomerById"),
-                    //            ActivatorUtilities.GetServiceOrCreateInstance<CustomerServiceImpl>(x).DeleteCustomerById));
-
-                    //svcs.AddSingleton<IServiceDefiner>(
-                    //    x =>
-                    //        new ServerStreamingServiceDefiner<CustomerSearch, IServerStreamWriter<Customer>>(
-                    //            Contracts.CustomerService.Descriptor.FindMethodByName("ListCustomers"),
-                    //            ActivatorUtilities.GetServiceOrCreateInstance<CustomerServiceImpl>(x).ListCustomers));
+                    svcs.AddSingleton<IMethodContext>(
+                        x =>
+                            new MethodContext<CustomerSearch, Customer, CustomerServiceImpl>(
+                                MethodType.ServerStreaming,
+                                "ListCustomers",
+                                ActivatorUtilities.GetServiceOrCreateInstance<CustomerServiceImpl>(x)));
                 })
                 .RunAsync();
         }

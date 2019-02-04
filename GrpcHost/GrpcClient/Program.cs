@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Contracts;
 using Grpc.Core;
@@ -22,13 +23,15 @@ namespace GrpcClient
             var customerResponse = await customerClient.GetCustomerByIdAsync(new GetCustomerByIdRequest { Id = 1 });
             Console.WriteLine($"Customer: {customerResponse.Customer.Id} retrieved.");
 
-            healthResponse = await healthClient.CheckAsync(new HealthCheckRequest { Service = Contracts.ProductService.Descriptor.FullName });
-            Console.WriteLine($"ProductService is: {healthResponse.Status}");
+            var customerResponse2 = customerClient.DeleteCustomerById(new DeleteCustomerByIdRequest { Id = 1 });
 
-            var productClient = new ProductService.ProductServiceClient(channel);
-            var productResponse = await productClient.GetProductForCustomerAsync(new GetProductsForCustomerRequest { CustomerId = customerResponse.Customer.Id });
-            Console.WriteLine("Products retrieved.");
+            var customerResponse3 = customerClient.ListCustomers(new CustomerSearch { FirstName = "test" });
+            while(await customerResponse3.ResponseStream.MoveNext(CancellationToken.None))
+            {
+                var response = customerResponse3.ResponseStream.Current;
+            }
 
+            
             await channel.ShutdownAsync();
 
             Console.ReadKey();
