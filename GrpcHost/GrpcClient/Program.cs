@@ -11,7 +11,7 @@ namespace GrpcClient
     {
         private static async Task Main(string[] args)
         {
-            Channel channel = new Channel("127.0.0.1:5000", ChannelCredentials.Insecure);
+            Channel channel = new Channel("localhost:5000", ChannelCredentials.Insecure);
             var healthClient = new Health.HealthClient(channel);
             var healthResponse = await healthClient.CheckAsync(new HealthCheckRequest());
             Console.WriteLine($"Server is: {healthResponse.Status}");

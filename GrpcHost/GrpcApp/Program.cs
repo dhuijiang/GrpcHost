@@ -19,7 +19,7 @@ namespace GrpcServer
         private static async Task Main(string[] args)
         {
             await
-                GrpcHostBuilder.BuildHost(args, (ctx, svcs) =>
+                GrpcHostBuilder.BuildHost<Program>(args, (ctx, svcs) =>
                 {
                     svcs.AddSingleton<HttpClient>();
                     svcs.AddTransient<ICustomerService, Services.CustomerService>();
@@ -27,23 +27,17 @@ namespace GrpcServer
                     svcs.AddSingleton<IMethodContext>(
                         x =>
                             new MethodContext<GetCustomerByIdRequest, GetCustomerByIdResponse, CustomerServiceImpl>(
-                                MethodType.Unary,
-                                "GetCustomerById",
                                 ActivatorUtilities.GetServiceOrCreateInstance<CustomerServiceImpl>(x),
                                 ActivatorUtilities.GetServiceOrCreateInstance<ExceptionInterceptor>(x)));
 
                     svcs.AddSingleton<IMethodContext>(
                         x =>
                             new MethodContext<DeleteCustomerByIdRequest, DeleteCustomerByIdResponse, CustomerServiceImpl>(
-                                MethodType.Unary,
-                                "DeleteCustomerById",
                                 ActivatorUtilities.GetServiceOrCreateInstance<CustomerServiceImpl>(x)));
 
                     svcs.AddSingleton<IMethodContext>(
                         x =>
                             new MethodContext<CustomerSearch, Customer, CustomerServiceImpl>(
-                                MethodType.ServerStreaming,
-                                "ListCustomers",
                                 ActivatorUtilities.GetServiceOrCreateInstance<CustomerServiceImpl>(x)));
                 })
                 .RunAsync();

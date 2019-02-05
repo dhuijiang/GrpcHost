@@ -1,21 +1,41 @@
-﻿using System.Linq;
+﻿using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Grpc.Core;
+using Grpc.Core.Logging;
+using GrpcHost;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using GrpcLogLevel = Grpc.Core.Logging.LogLevel;
 
-namespace GrpcHost
+namespace Techsson.Gaming.Infrastructure.Grpc.Host
 {
+    /// <summary>
+    /// Represents implementation of <see cref="IHostedService"/> specialized for hosting gRPC services.
+    /// </summary>
     public class GrpcHostedService : IHostedService
     {
-        private readonly GrpcServer _server;
-        private readonly IApplicationLifetime _applicationLifetime;
-        private readonly ILogger<GrpcHostedService> _logger;
+        private static readonly Lazy<Process> _bashProcess = new Lazy<Process>(GetBashProcess);
 
+        private readonly IApplicationLifetime _applicationLifetime;
+        private readonly Microsoft.Extensions.Logging.ILogger _logger;
+        private GrpcServer _server;
+
+        /// <summary>
+        /// Initializes new instance of <see cref="GrpcHostedService"/>
+        /// </summary>
+        /// <param name="server">Instance of <see cref="Server"/>.</param>
+        /// <param name="clientCache" Instance of <see cref="IGrpcClientCache"/>.
+        /// <param name="definitions">Dictionary that should contain gRPC service implementation that need to be registered with server.</param>
+        /// <param name="applicationLifetime">Instance of <see cref="IApplicationLifetime"/>.</param>
+        /// <param name="logger">Instance of <see cref="ILogger"/> that will be configured to use Serilog Splunk of Console sink.</param>
         public GrpcHostedService(
             GrpcServer server,
             IApplicationLifetime applicationLifetime,
-            ILogger<GrpcHostedService> logger)
+            Microsoft.Extensions.Logging.ILogger logger)
         {
             _server = server;
             _applicationLifetime = applicationLifetime;
@@ -26,66 +46,85 @@ namespace GrpcHost
         {
             _applicationLifetime.ApplicationStarted.Register(OnStarted);
             _applicationLifetime.ApplicationStopping.Register(OnStopping);
-            _applicationLifetime.ApplicationStopped.Register(OnStopped);
 
-            _logger.LogInformation("Server is starting.");
+            GrpcEnvironment.SetLogger(new LogLevelFilterLogger(new GrpcLogger(_logger), GrpcLogLevel.Debug, false));
+            GrpcEnvironment.Logger.Info("Testing gRPC Logger.");
+
+            _logger.LogInformation("Server is starting.", null);
 
             _server.Start();
-            _logger.LogInformation($"Server running on: {_server.Ports.Select(p => $"{ p.Host}:{ p.BoundPort}").First()}");
+
+            string serverAddress = _server.Ports.Select(p => string.Format("{0}:{1}", p.Host, p.Port.ToString())).First();
+            _logger.LogInformation($"Server running on: {serverAddress}", null);
 
             return Task.CompletedTask;
         }
 
         private void OnStarted()
         {
-            _logger.LogInformation("OnStarted triggered.");
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                _logger.LogInformation($"OS: {RuntimeInformation.OSDescription}: {RuntimeInformation.OSArchitecture}{Environment.NewLine} .Net: {RuntimeInformation.FrameworkDescription}", null);
+
+                return;
+            }
+
+            ExecuteBashCommand("cat /etc/os-release", _logger);
+            ExecuteBashCommand("uname -a", _logger);
         }
 
-        public async Task StopAsync(CancellationToken cancellationToken)
+        public Task StopAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Server is stopping.");
+            _logger.LogInformation("Server has stopped.", null);
 
-            await StopAction(cancellationToken).ConfigureAwait(false);
-        }
-
-        public virtual Task StopAction(CancellationToken cancellationToken)
-        {
             return Task.CompletedTask;
-        }
-
-        public virtual void PreServerStopAction()
-        {
         }
 
         private void OnStopping()
         {
-            _logger.LogInformation("OnStopping has been called.");
-
-            // OnStopping get called before StopAsync
-            UpdateHealthStatusToNotServing();
-
-            PreServerStopAction();
+            _logger.LogInformation("OnStopping has been called.", null);
 
             _server.ShutdownAsync().ConfigureAwait(false).GetAwaiter().GetResult();
-
-            _logger.LogInformation("OnStopping ended.");
         }
 
-        // In case we need to send some sort of notification towards outside, otherwise we probably are never going to need this.
-        private void OnStopped()
+        private static void ExecuteBashCommand(string command, Microsoft.Extensions.Logging.ILogger logger)
         {
-            _logger.LogInformation("OnStopped has been called.");
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                return;
+
+            var process = _bashProcess.Value;
+            process.StartInfo.Arguments = $"-c \"{command}\"";
+
+            try
+            {
+                process.Start();
+                string result = _bashProcess.Value.StandardOutput.ReadToEnd();
+                process.WaitForExit();
+
+                logger.LogInformation(result, null);
+
+                process.Close();
+            }
+            catch
+            {
+                logger.LogInformation("Bash not installed.", null);
+            }
+            finally
+            {
+                process?.Close();
+            }
+
         }
 
-        private void UpdateHealthStatusToNotServing()
+        private static Process GetBashProcess()
         {
-            //_healthServiceImpl.SetStatus("", HealthCheckResponse.Types.ServingStatus.NotServing);
-
-            ////foreach (var(serviceName, _) in GetDefinitions())
-            ////{
-            ////    _logger.LogInformation($"Setting service: {serviceName} status to: NotServing");
-            ////    _healthServiceImpl.SetStatus(serviceName, HealthCheckResponse.Types.ServingStatus.NotServing);
-            ////}
+            return Process.Start(new ProcessStartInfo
+            {
+                FileName = "/bin/bash",
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            });
         }
     }
 }
