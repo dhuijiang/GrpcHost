@@ -19,6 +19,8 @@ namespace GrpcHost
         public string Host { get; set; } = "0.0.0.0";
 
         public int Port { get; set; } = 80;
+
+        public IEnumerable<IMethodContext> RegisteredMethods { get; internal set; } = Enumerable.Empty<IMethodContext>();
     }
 
     public class DiagnosticInterceptorOption
@@ -26,10 +28,5 @@ namespace GrpcHost
         public string ResponseTypeName { get; set; }
 
         public string[] PropertyNames { get; set; }
-    }
-
-    public class GrpcServerOptions
-    {
-        public IEnumerable<IMethodContext> RegisteredMethods { get; internal set; } = Enumerable.Empty<IMethodContext>();
     }
 }

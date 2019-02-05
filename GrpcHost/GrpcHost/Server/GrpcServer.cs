@@ -17,10 +17,10 @@ namespace GrpcHost
         private readonly HealthServiceImpl _healthService;
         private readonly ExceptionInterceptor _globalInterceptor;
 
-        public GrpcServer(IOptions<HostOptions> options, IOptions<GrpcServerOptions> serverOptions, ExtendedHealthServiceImpl healthService, ExceptionInterceptor globalInterceptor)
+        public GrpcServer(IOptions<HostOptions> options, ExtendedHealthServiceImpl healthService, ExceptionInterceptor globalInterceptor)
         {
             _options = options.Value ?? new HostOptions();
-            _contexts = serverOptions.Value.RegisteredMethods;
+            _contexts = options.Value.RegisteredMethods;
             _healthService = healthService;
             _globalInterceptor = globalInterceptor;
         }

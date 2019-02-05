@@ -38,7 +38,7 @@ namespace GrpcHost
                     configSvc.Configure<IEnumerable<DiagnosticInterceptorOption>>(hostContext.Configuration.GetSection("DiagnosticInterceptorOptions"));
 
                     // TODO: Try and refactor this to something better
-                    configSvc.Configure<GrpcServerOptions>(x =>
+                    configSvc.Configure<HostOptions>(x =>
                     {
                         using (var provider = configSvc.BuildServiceProvider())
                         {
