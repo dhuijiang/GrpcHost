@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using GrpcHost.Interceptors;
+using GrpcHost.Methods;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -36,11 +37,19 @@ namespace GrpcHost
                     configSvc.Configure<HostOptions>(hostContext.Configuration.GetSection("HostOptions"));
                     configSvc.Configure<IEnumerable<DiagnosticInterceptorOption>>(hostContext.Configuration.GetSection("DiagnosticInterceptorOptions"));
 
-                    //configSvc.AddSingleton<ILoggerProvider, GameplaySerilogLoggerProvider>();
+                    // TODO: Try and refactor this to something better
+                    configSvc.Configure<GrpcServerOptions>(x =>
+                    {
+                        using (var provider = configSvc.BuildServiceProvider())
+                        {
+                            x.RegisteredMethods = provider.GetServices<IMethodContext>();
+                        }
+                    });
+
+                    //configSvc.AddSingleton<ILoggerProvider, SplunkSerilogLoggerProvider>();
                     configSvc.AddSingleton<ILogger, Logger<T>>();
-                    
+
                     configSvc.AddTransient(x => new ExtendedHealthServiceImpl(null));
-                    configSvc.AddSingleton<IMethodResolver, MethodResolver>();
                     configSvc.AddSingleton<ExceptionInterceptor>();
                     configSvc.AddSingleton<GrpcServer>();
 

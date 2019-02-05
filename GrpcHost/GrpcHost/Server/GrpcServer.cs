@@ -1,24 +1,26 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using Grpc.Core;
 using Grpc.Core.Interceptors;
 using Grpc.Health.V1;
 using Grpc.HealthCheck;
 using GrpcHost.Interceptors;
+using GrpcHost.Methods;
 using Microsoft.Extensions.Options;
 
 namespace GrpcHost
 {
+    // This supports only one global interceptor, a better solution is needed.
     public sealed class GrpcServer : Server
     {
         private readonly HostOptions _options;
-        private readonly IMethodResolver _methodResolver;
+        private readonly IEnumerable<IMethodContext> _contexts;
         private readonly HealthServiceImpl _healthService;
         private readonly ExceptionInterceptor _globalInterceptor;
 
-        public GrpcServer(IOptions<HostOptions> options, IMethodResolver methodResolver, ExtendedHealthServiceImpl healthService, ExceptionInterceptor globalInterceptor)
+        public GrpcServer(IOptions<HostOptions> options, IOptions<GrpcServerOptions> serverOptions, ExtendedHealthServiceImpl healthService, ExceptionInterceptor globalInterceptor)
         {
             _options = options.Value ?? new HostOptions();
-            _methodResolver = methodResolver;
+            _contexts = serverOptions.Value.RegisteredMethods;
             _healthService = healthService;
             _globalInterceptor = globalInterceptor;
         }
@@ -28,7 +30,7 @@ namespace GrpcHost
             Ports.Add(_options.Host, _options.Port, ServerCredentials.Insecure);
             _healthService.SetStatus("", HealthCheckResponse.Types.ServingStatus.Serving);
 
-            foreach (var context in _methodResolver.RegisteredMethods)
+            foreach (var context in _contexts)
             {
                 Services.Add(context.GetDefinition().Intercept(_globalInterceptor));
 

@@ -10,7 +10,7 @@ using Grpc.Core;
 using Grpc.Core.Interceptors;
 using ServiceDescriptor = Google.Protobuf.Reflection.ServiceDescriptor;
 
-namespace GrpcHost
+namespace GrpcHost.Methods
 {
     public interface IMethodContext
     {

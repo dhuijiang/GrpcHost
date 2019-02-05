@@ -1,0 +1,13 @@
+﻿{
+  "HostOptions": {
+    "Host": "localhost",
+    "Port": 5000
+  },
+  "LoggingOptions": {},
+  "DiagnosticInterceptorOptions": [
+    {
+      "ResponseTypeName": "GetTimeoutResponse",
+      "PropertyNames": [ "*" ]
+    }
+  ]
+}

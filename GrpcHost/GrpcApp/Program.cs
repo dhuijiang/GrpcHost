@@ -1,13 +1,10 @@
-﻿using System;
-using System.Linq.Expressions;
-using System.Net.Http;
-using System.Reflection;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
 using Contracts;
 using CustomerGrpcService;
-using Grpc.Core;
 using GrpcHost;
 using GrpcHost.Interceptors;
+using GrpcHost.Methods;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Services;
