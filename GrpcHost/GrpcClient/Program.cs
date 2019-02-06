@@ -30,7 +30,6 @@ namespace GrpcClient
             {
                 var response = customerResponse3.ResponseStream.Current;
             }
-
             
             await channel.ShutdownAsync();
 

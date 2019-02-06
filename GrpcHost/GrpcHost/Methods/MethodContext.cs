@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Threading.Tasks;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
 using Grpc.Core;
@@ -15,6 +14,7 @@ namespace GrpcHost.Methods
     public interface IMethodContext
     {
         string GetServiceName();
+
         ServerServiceDefinition GetDefinition();
     }
 
@@ -52,28 +52,21 @@ namespace GrpcHost.Methods
             switch (_methodType)
             {
                 case MethodType.Unary:
-                    builder.AddMethod(
-                        method,
-                        new UnaryServerMethod<TRequest, TResponse>(BuildHandler<Func<TRequest, ServerCallContext, Task<TResponse>>>(_instance, _methodName)));
-
+                    builder.AddMethod(method, CreateDelegate<UnaryServerMethod<TRequest, TResponse>>(_instance, _methodName));
                     break;
 
                 case MethodType.ClientStreaming:
-                    builder.AddMethod(
-                        method,
-                        new ClientStreamingServerMethod<TRequest, TResponse>(BuildHandler<Func<IAsyncStreamReader<TRequest>, ServerCallContext, Task<TResponse>>>(_instance, _methodName)));
+                    builder.AddMethod(method, CreateDelegate<ClientStreamingServerMethod<TRequest, TResponse>>(_instance, _methodName));
 
                     break;
                 case MethodType.ServerStreaming:
                     builder.AddMethod(
-                        method,
-                        new ServerStreamingServerMethod<TRequest, TResponse>(BuildHandler<Func<TRequest, IServerStreamWriter<TResponse>, ServerCallContext, Task>>(_instance, _methodName)));
+                        method, CreateDelegate<ServerStreamingServerMethod<TRequest, TResponse>>(_instance, _methodName));
 
                     break;
                 case MethodType.DuplexStreaming:
                     builder.AddMethod(
-                        method,
-                        new DuplexStreamingServerMethod<TRequest, TResponse>(BuildHandler<Func<IAsyncStreamReader<TRequest>, IServerStreamWriter<TResponse>, ServerCallContext, Task>>(_instance, _methodName)));
+                        method, CreateDelegate<DuplexStreamingServerMethod<TRequest, TResponse>>(_instance, _methodName));
 
                     break;
             }
@@ -86,10 +79,16 @@ namespace GrpcHost.Methods
             return definition.Intercept(_interceptors);
         }
 
+        private static TDel CreateDelegate<TDel>(TServiceImpl instance, string methodName) where TDel : Delegate
+        {
+            var del = Delegate.CreateDelegate(typeof(TDel), instance, methodName);
+
+            return (TDel)del;
+        }
+
         private static (MethodDescriptor, MethodType, string) GetMethodMetadata<TService>()
         {
-            var serviceType = typeof(TService);
-            var baseServiceType = GetBaseType(serviceType);
+            var baseServiceType = GetBaseType(typeof(TService));
             var serviceContainerType = baseServiceType.DeclaringType;
             var serviceDescriptor = (ServiceDescriptor)serviceContainerType.GetProperty("Descriptor").GetValue(serviceContainerType);
             var methodDescriptor = serviceDescriptor.Methods.FirstOrDefault(x => x.InputType.ClrType == typeof(TRequest) && x.OutputType.ClrType == typeof(TResponse));
@@ -98,13 +97,10 @@ namespace GrpcHost.Methods
 
             Type GetBaseType(Type type)
             {
-                var objectType = typeof(object);
                 var baseType = type;
 
-                while (!baseType.BaseType.Equals(objectType))
-                {
-                    baseType = baseType.BaseType;
-                }
+                if (!baseType.BaseType.Equals(typeof(object)))
+                    return GetBaseType(baseType.BaseType);
 
                 return baseType;
             }
