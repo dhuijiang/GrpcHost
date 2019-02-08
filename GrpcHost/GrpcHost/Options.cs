@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using GrpcHost.Methods;
+using Microsoft.Extensions.Logging;
 
 namespace GrpcHost
 {
@@ -35,7 +37,7 @@ namespace GrpcHost
         {
             public bool LogAll { get; set; } = false;
 
-            public string[] WellKnownProperties { get; set; } = new string[0];
+            public Collection<string> WellKnownProperties { get; set; } = new Collection<string>();
 
             public Collection<PropertyMetadata> PropertyFilter { get; set; } = new Collection<PropertyMetadata>();
         }

@@ -1,4 +1,6 @@
 ﻿using System.Threading.Tasks;
+using Contracts;
+using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using Services.Entities;
 
@@ -18,16 +20,20 @@ namespace Services
             _logger = logger;
         }
 
-        public Task<CustomerEntity> GetById(int id)
+        public async Task<CustomerEntity> GetById(int id)
         {
             _logger.LogInformation($"Getting customer by id: {id}");
 
-            return Task.FromResult(new CustomerEntity
+            var client = new ProductService.ProductServiceClient(new Channel("localhost:5000", ChannelCredentials.Insecure));
+            
+            var response = await client.GetProductForCustomerAsync(new GetProductsForCustomerRequest { CustomerId = id }).ResponseAsync.ConfigureAwait(false);
+
+            return new CustomerEntity
             {
                 Id = id,
                 FirstName = "Gordon",
                 LastName = "Ramsey"
-            });
+            };
         }
     }
 }

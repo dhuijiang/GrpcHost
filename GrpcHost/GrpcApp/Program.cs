@@ -7,6 +7,7 @@ using GrpcHost.Interceptors;
 using GrpcHost.Methods;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ProductGrpcService;
 using Services;
 
 namespace GrpcServer
@@ -36,6 +37,11 @@ namespace GrpcServer
                         x =>
                             new MethodContext<CustomerSearch, Customer, CustomerServiceImpl>(
                                 ActivatorUtilities.GetServiceOrCreateInstance<CustomerServiceImpl>(x)));
+
+                    svcs.AddSingleton<IMethodContext>(
+                        x =>
+                            new MethodContext<GetProductsForCustomerRequest, GetProductsForCustomerResponse, ProductServiceImpl>(
+                                ActivatorUtilities.GetServiceOrCreateInstance<ProductServiceImpl>(x)));
                 })
                 .RunAsync();
         }

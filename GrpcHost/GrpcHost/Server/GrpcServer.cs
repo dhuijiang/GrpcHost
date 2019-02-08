@@ -15,9 +15,9 @@ namespace GrpcHost
         private readonly HostOptions _options;
         private readonly IEnumerable<IMethodContext> _contexts;
         private readonly HealthServiceImpl _healthService;
-        private readonly ExceptionInterceptor _globalInterceptor;
+        private readonly GlobalInterceptor _globalInterceptor;
 
-        public GrpcServer(IOptions<HostOptions> options, ExtendedHealthServiceImpl healthService, ExceptionInterceptor globalInterceptor)
+        public GrpcServer(IOptions<HostOptions> options, ExtendedHealthServiceImpl healthService, GlobalInterceptor globalInterceptor)
         {
             _options = options.Value ?? new HostOptions();
             _contexts = options.Value.RegisteredMethods;

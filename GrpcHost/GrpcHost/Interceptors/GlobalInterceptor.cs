@@ -30,7 +30,6 @@ namespace GrpcHost.Interceptors
             ServerCallContext context,
             UnaryServerMethod<TRequest, TResponse> continuation)
         {
-            RequestCorrelationId.TrySetFrom(context.RequestHeaders);
             LogContract(request, context.Method, _options.RequestLoggingOptions);
 
             TResponse response;
@@ -39,11 +38,11 @@ namespace GrpcHost.Interceptors
             {
                 response = await base.UnaryServerHandler(request, context, continuation).ConfigureAwait(false);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "{Method} {ErrorMessage}", ex.TargetSite?.Name ?? "Not set", ex.Message);
 
-                throw ExceptionUtil.CreateRpcException(ex);
+                throw;
             }
 
             LogContract(response, context.Method, _options.ResponseLoggingOptions, false);
@@ -59,15 +58,15 @@ namespace GrpcHost.Interceptors
 
             var propertyNames = new List<string>();
 
-            if(typeToLog != null || loggingOptions.LogAll)
+            if (typeToLog != null || loggingOptions.LogAll)
                 propertyNames.AddRange(loggingOptions.WellKnownProperties);
-            
-            if(typeToLog != null)
+
+            if (typeToLog != null)
                 propertyNames.AddRange(typeToLog.PropertyNames);
 
             (string message, List<object> parameters) = ("{Method} ", new List<object> { methodName });
 
-            if(!propertyNames.Any())
+            if (!propertyNames.Any())
             {
                 _logger.LogInformation(message, parameters.ToArray());
 
@@ -76,16 +75,16 @@ namespace GrpcHost.Interceptors
 
             var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance).ToList();
 
-            if(!properties.Any())
+            if (!properties.Any())
             {
                 _logger.LogInformation(message, parameters.ToArray());
 
                 return;
             }
 
-            foreach(var name in propertyNames)
+            foreach (var name in propertyNames)
             {
-                if(name == "*")
+                if (name == "*")
                 {
                     message += isRequest ? "{Request} " : "{Response }";
                     parameters.Add(JsonConvert.SerializeObject(instance, Formatting.None));
@@ -95,17 +94,17 @@ namespace GrpcHost.Interceptors
 
                 var property = properties.FirstOrDefault(x => x.Name == name);
 
-                if(property == null)
+                if (property == null)
                     continue;
 
                 object value = property?.GetValue(instance);
 
-                if(value == null)
+                if (value == null)
                     continue;
 
                 message += "{" + name + "}";
 
-                if(property.PropertyType.GetProperties(BindingFlags.Public | BindingFlags.Instance).Length > 0)
+                if (property.PropertyType.GetProperties(BindingFlags.Public | BindingFlags.Instance).Length > 0)
                     parameters.Add(JsonConvert.SerializeObject(value, Formatting.None));
                 else
                     parameters.Add(value.ToString());

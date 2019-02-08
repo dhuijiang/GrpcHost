@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using GrpcHost.Interceptors;
+using GrpcHost.Logging;
 using GrpcHost.Methods;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
