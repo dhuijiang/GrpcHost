@@ -33,9 +33,8 @@ namespace GrpcHost
                 })
                 .ConfigureServices((hostContext, configSvc) =>
                 {
-                    //configSvc.Configure<LoggingOptions>(hostContext.Configuration.GetSection("LoggingOptions"));
+                    configSvc.Configure<LoggingOptions>(hostContext.Configuration.GetSection("LoggingOptions"));
                     configSvc.Configure<HostOptions>(hostContext.Configuration.GetSection("HostOptions"));
-                    configSvc.Configure<IEnumerable<DiagnosticInterceptorOption>>(hostContext.Configuration.GetSection("DiagnosticInterceptorOptions"));
 
                     // TODO: Try and refactor this to something better
                     configSvc.Configure<HostOptions>(x =>
@@ -46,11 +45,12 @@ namespace GrpcHost
                         }
                     });
 
-                    //configSvc.AddSingleton<ILoggerProvider, SplunkSerilogLoggerProvider>();
+                    configSvc.AddSingleton<ILoggerProvider, SplunkSerilogLoggerProvider>();
                     configSvc.AddSingleton<ILogger, Logger<T>>();
 
                     configSvc.AddSingleton<ExtendedHealthServiceImpl>();
                     configSvc.AddSingleton<ExceptionInterceptor>();
+                    configSvc.AddSingleton<GlobalInterceptor>();
                     configSvc.AddSingleton<GrpcServer>();
 
                     configSvc.AddHostedService<GrpcHostedService>();
