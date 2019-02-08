@@ -1,13 +1,29 @@
-﻿{
+{
+  "LoggingOptions": {
+    "MinimumLogLevel": 1,
+    "RequestLoggingOptions": {
+      "LogAll": "True",
+      "WellKnownProperties": [ "BrandId", "ProviderId", "GameId", "GameSessionId", "CustomerId", "WalletAccountId" ],
+      "PropertyFilter": []
+    },
+    "ResponseLoggingOptions": {
+      "LogAll": "True",
+      "WellKnownProperties": [],
+      "PropertyFilter": [
+        {
+          "TypeName": "GetTimeOutResponse",
+          "PropertyNames": [ "*" ]
+        },
+        {
+          "TypeName": "GetRandomNumberResponse",
+          "PropertyNames": [ "RandomNumber" ]
+        }
+      ]
+    }
+  },
+
   "HostOptions": {
     "Host": "localhost",
     "Port": 5000
-  },
-  "LoggingOptions": {},
-  "DiagnosticInterceptorOptions": [
-    {
-      "ResponseTypeName": "GetTimeoutResponse",
-      "PropertyNames": [ "*" ]
-    }
-  ]
+  }
 }
