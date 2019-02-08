@@ -23,10 +23,28 @@ namespace GrpcHost
         public IEnumerable<IMethodContext> RegisteredMethods { get; internal set; } = Enumerable.Empty<IMethodContext>();
     }
 
-    public class DiagnosticInterceptorOption
+    public class LoggingOptions
     {
-        public string ResponseTypeName { get; set; }
+        public LogLevel MinimumLogLevel { get; set; } = LogLevel.Warning;
 
-        public string[] PropertyNames { get; set; }
+        public TypeLoggingOptions RequestLoggingOptions { get; set; } = new TypeLoggingOptions();
+
+        public TypeLoggingOptions ResponseLoggingOptions { get; set; } = new TypeLoggingOptions();
+
+        public class TypeLoggingOptions
+        {
+            public bool LogAll { get; set; } = false;
+
+            public string[] WellKnownProperties { get; set; } = new string[0];
+
+            public Collection<PropertyMetadata> PropertyFilter { get; set; } = new Collection<PropertyMetadata>();
+        }
+
+        public class PropertyMetadata
+        {
+            public string TypeName { get; set; }
+
+            public Collection<string> PropertyNames { get; set; } = new Collection<string>();
+        }
     }
 }
