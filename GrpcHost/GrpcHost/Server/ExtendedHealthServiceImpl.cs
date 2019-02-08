@@ -6,25 +6,30 @@ using Grpc.HealthCheck;
 
 namespace GrpcHost
 {
+    public delegate Task<HealthCheckResponse> HealthCheckOverride();
+
     /// <summary>
     /// Represents the class that overrides the behavior of <see cref="Health.HealthBase.Check(HealthCheckRequest, ServerCallContext)".
     /// </summary>
     public class ExtendedHealthServiceImpl : HealthServiceImpl
     {
-        private readonly Func<HealthCheckRequest, ServerCallContext, Task<HealthCheckResponse>> _check;
+        private readonly HealthCheckOverride _checkOverride;
 
         /// <summary>
         /// Initializes new instance of <see cref="ExtendedHealthServiceImpl"/>.
         /// </summary>
         /// <param name="check">If provided it will override the logic of <see cref="Health.HealthBase.Check(HealthCheckRequest, ServerCallContext)" method./></param>
-        public ExtendedHealthServiceImpl(Func<HealthCheckRequest, ServerCallContext, Task<HealthCheckResponse>> check)
+        public ExtendedHealthServiceImpl(HealthCheckOverride checkOverride = null)
         {
-            _check = check;
+            _checkOverride = checkOverride;
         }
 
         public override Task<HealthCheckResponse> Check(HealthCheckRequest request, ServerCallContext context)
         {
-            return _check == null ? base.Check(request, context) : _check(request, context);
+            return
+                _checkOverride == null
+                ? Check(request, context)
+                : _checkOverride();
         }
     }
 }
