@@ -49,7 +49,7 @@ namespace GrpcHost
                     //configSvc.AddSingleton<ILoggerProvider, SplunkSerilogLoggerProvider>();
                     configSvc.AddSingleton<ILogger, Logger<T>>();
 
-                    configSvc.AddTransient(x => new ExtendedHealthServiceImpl(null));
+                    configSvc.AddSingleton<ExtendedHealthServiceImpl>();
                     configSvc.AddSingleton<ExceptionInterceptor>();
                     configSvc.AddSingleton<GrpcServer>();
 
