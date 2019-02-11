@@ -28,7 +28,7 @@ namespace GrpcHost
         {
             return
                 _checkOverride == null
-                ? Check(request, context)
+                ? base.Check(request, context)
                 : _checkOverride();
         }
     }

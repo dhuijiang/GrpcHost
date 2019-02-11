@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Grpc.Core.Interceptors;
+using GrpcHost.Server;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -12,17 +13,20 @@ using Newtonsoft.Json;
 namespace GrpcHost.Interceptors
 {
     // Note: When chaining the interceptors (usually: Program.cs of gRPC service project) the last in the chain will be executed first - mime01
-    public class GlobalInterceptor : Interceptor
+    internal class GlobalInterceptor : Interceptor
     {
         private readonly ILogger _logger;
         private readonly LoggingOptions _options;
+        private readonly ICallContext _callContext;
 
         public GlobalInterceptor(
             ILogger logger,
-            IOptionsMonitor<LoggingOptions> options)
+            IOptionsMonitor<LoggingOptions> options,
+            ICallContext callContext)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _options = options.CurrentValue ?? new LoggingOptions();
+            _callContext = callContext ?? throw new ArgumentNullException(nameof(callContext));
         }
 
         public override async Task<TResponse> UnaryServerHandler<TRequest, TResponse>(
@@ -30,6 +34,8 @@ namespace GrpcHost.Interceptors
             ServerCallContext context,
             UnaryServerMethod<TRequest, TResponse> continuation)
         {
+            _callContext.RegisterCorellationId(context);
+
             LogContract(request, context.Method, _options.RequestLoggingOptions);
 
             TResponse response;

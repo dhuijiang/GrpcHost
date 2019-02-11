@@ -16,7 +16,7 @@ namespace Techsson.Gaming.Infrastructure.Grpc.Host
     /// <summary>
     /// Represents implementation of <see cref="IHostedService"/> specialized for hosting gRPC services.
     /// </summary>
-    public class GrpcHostedService : IHostedService
+    internal class GrpcHostedService : IHostedService
     {
         private static readonly Lazy<Process> _bashProcess = new Lazy<Process>(GetBashProcess);
 

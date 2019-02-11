@@ -25,8 +25,7 @@ namespace GrpcServer
                     svcs.AddSingleton<IMethodContext>(
                         x =>
                             new MethodContext<GetCustomerByIdRequest, GetCustomerByIdResponse, CustomerServiceImpl>(
-                                ActivatorUtilities.GetServiceOrCreateInstance<CustomerServiceImpl>(x),
-                                ActivatorUtilities.GetServiceOrCreateInstance<ExceptionInterceptor>(x)));
+                                ActivatorUtilities.GetServiceOrCreateInstance<CustomerServiceImpl>(x)));
 
                     svcs.AddSingleton<IMethodContext>(
                         x =>

@@ -15,7 +15,7 @@ namespace Services
     {
         private readonly ILogger _logger;
 
-        public CustomerService(ILogger<CustomerService> logger)
+        public CustomerService(ILogger logger)
         {
             _logger = logger;
         }

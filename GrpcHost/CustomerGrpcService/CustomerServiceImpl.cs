@@ -22,7 +22,10 @@ namespace CustomerGrpcService
 
         public override async Task<GetCustomerByIdResponse> GetCustomerById(GetCustomerByIdRequest request, ServerCallContext context)
         {
-            var customerEntity = await _customerService.GetById(request.Id).ConfigureAwait(false);
+            var client = new Contracts.CustomerService.CustomerServiceClient(new Channel("localhost:5000", ChannelCredentials.Insecure));
+            await client.DeleteCustomerByIdAsync(new DeleteCustomerByIdRequest { Id = request.Id }).ResponseAsync.ConfigureAwait(false);
+
+            var customerEntity = await _customerService.GetById(request.Id);
 
             return new GetCustomerByIdResponse
             {

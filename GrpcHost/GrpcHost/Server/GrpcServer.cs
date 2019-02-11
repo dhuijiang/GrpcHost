@@ -10,11 +10,11 @@ using Microsoft.Extensions.Options;
 namespace GrpcHost
 {
     // This supports only one global interceptor, a better solution is needed.
-    public sealed class GrpcServer : Server
+    internal sealed class GrpcServer : Grpc.Core.Server
     {
         private readonly HostOptions _options;
         private readonly IEnumerable<IMethodContext> _contexts;
-        private readonly HealthServiceImpl _healthService;
+        private readonly ExtendedHealthServiceImpl _healthService;
         private readonly GlobalInterceptor _globalInterceptor;
 
         public GrpcServer(IOptions<HostOptions> options, ExtendedHealthServiceImpl healthService, GlobalInterceptor globalInterceptor)

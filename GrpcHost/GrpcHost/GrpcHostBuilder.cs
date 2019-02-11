@@ -3,6 +3,7 @@ using System.IO;
 using GrpcHost.Interceptors;
 using GrpcHost.Logging;
 using GrpcHost.Methods;
+using GrpcHost.Server;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -27,10 +28,6 @@ namespace GrpcHost
                 {
                     configApp.AddCommandLine(args);
                 })
-                .ConfigureLogging((hostContext, configLogging) =>
-                {
-                    configLogging.AddConsole();
-                })
                 .ConfigureServices((hostContext, configSvc) =>
                 {
                     configSvc.Configure<LoggingOptions>(hostContext.Configuration.GetSection("LoggingOptions"));
@@ -45,11 +42,12 @@ namespace GrpcHost
                         }
                     });
 
+                    configSvc.AddSingleton<ICallContext, CallContext>();
+                    configSvc.AddSingleton<CorrelationEnricher>();
                     configSvc.AddSingleton<ILoggerProvider, SplunkSerilogLoggerProvider>();
                     configSvc.AddSingleton<ILogger, Logger<T>>();
 
                     configSvc.AddSingleton<ExtendedHealthServiceImpl>();
-                    configSvc.AddSingleton<ExceptionInterceptor>();
                     configSvc.AddSingleton<GlobalInterceptor>();
                     configSvc.AddSingleton<GrpcServer>();
 

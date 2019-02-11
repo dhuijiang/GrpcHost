@@ -10,19 +10,21 @@ namespace GrpcHost.Logging
 {
     internal class SplunkSerilogLoggerProvider : SerilogLoggerProvider
     {
-        public SplunkSerilogLoggerProvider(IOptionsMonitor<LoggingOptions> loggingOptions)
-            : base(ConfigureSerilogLogger(SetLogEventLevel(loggingOptions.CurrentValue.MinimumLogLevel)), false)
+        public SplunkSerilogLoggerProvider(CorrelationEnricher correlationEnricher, IOptionsMonitor<LoggingOptions> loggingOptions)
+            : base(ConfigureSerilogLogger(correlationEnricher, SetLogEventLevel(loggingOptions.CurrentValue.MinimumLogLevel)), false)
         {
         }
 
-        private static ISeriLogger ConfigureSerilogLogger(LogEventLevel minimulLogLevel)
+        private static ISeriLogger ConfigureSerilogLogger(CorrelationEnricher correlationEnricher, LogEventLevel minimulLogLevel)
         {
-            var config = new LoggerConfiguration().MinimumLevel.Is(minimulLogLevel);
+            var config =
+                new LoggerConfiguration()
+                    .MinimumLevel.Is(minimulLogLevel)
+                    .Enrich.With(correlationEnricher);
 
             ISeriLogger logger = ConfigureSerilogConsole();
 
             return logger;
-
 
             ISeriLogger ConfigureSerilogConsole()
             {
