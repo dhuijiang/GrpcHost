@@ -16,14 +16,9 @@ namespace GrpcHost.Server
 
     internal class CallContext : ICallContext
     {
-        private static int Counter = 0;
+        private const string HeaderName = "correlation-id";
         private static readonly AsyncLocal<string> _id = new AsyncLocal<string>();
         private string _methodName;
-
-        public CallContext()
-        {
-            Counter++;
-        }
 
         public string GetCorrelationId()
         {
@@ -47,16 +42,22 @@ namespace GrpcHost.Server
 
             var correlationId = context.RequestHeaders.FirstOrDefault(x => x.Key == "correlation-id");
 
-            // Header value cannot be null.
-            if (correlationId != null)
+            if(correlationid == null)
             {
-                _id.Value = correlationId.Value;
-
-                return;
+                Id.Value = Random().ToString("x");
+                context.RequestHeaders.Add(HeaderName, Id.Value);
             }
 
-            _id.Value = Guid.NewGuid().ToString();
-            context.RequestHeaders.Add("correlation-id", _id.Value);
+            if(string.IsNullOrWhiteSpace(Id.Value))
+                Id.Value = correlationid.Value;
+        }
+        
+        private static ulong Random()
+        {
+            var guid = Guid.Parse(Guid.NewGuid().ToString());
+            var bytes = guid.ToByteArray();
+
+            return BitConverter.ToUInt64(bytes, 0);
         }
     }
 }
