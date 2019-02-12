@@ -1,35 +1,40 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Grpc.Core;
 using Grpc.Health.V1;
 using Grpc.HealthCheck;
 
 namespace GrpcHost
 {
-    public delegate Task<HealthCheckResponse> HealthCheckOverride();
-
     /// <summary>
     /// Represents the class that overrides the behavior of <see cref="Health.HealthBase.Check(HealthCheckRequest, ServerCallContext)".
     /// </summary>
-    public class ExtendedHealthServiceImpl : HealthServiceImpl
+    public sealed class ExtendedHealthServiceImpl : HealthServiceImpl
     {
-        private readonly HealthCheckOverride _checkOverride;
+        private readonly IHealthCheckOverrider _overrider;
 
         /// <summary>
         /// Initializes new instance of <see cref="ExtendedHealthServiceImpl"/>.
         /// </summary>
         /// <param name="check">If provided it will override the logic of <see cref="Health.HealthBase.Check(HealthCheckRequest, ServerCallContext)" method./></param>
-        public ExtendedHealthServiceImpl(HealthCheckOverride checkOverride = null)
+        public ExtendedHealthServiceImpl(IHealthCheckOverrider overrider = null)
         {
-            _checkOverride = checkOverride;
+            _overrider = overrider;
         }
 
-        public override Task<HealthCheckResponse> Check(HealthCheckRequest request, ServerCallContext context)
+        public override async Task<HealthCheckResponse> Check(HealthCheckRequest request, ServerCallContext context)
         {
             return
-                _checkOverride == null
-                ? base.Check(request, context)
-                : _checkOverride();
+                _overrider == null
+                ? await base.Check(request, context)
+                : new HealthCheckResponse { Status = await GetStatusAsync() };
+
+            async Task<HealthCheckResponse.Types.ServingStatus> GetStatusAsync()
+            {
+                return
+                    await _overrider.IsHealthy()
+                        ? HealthCheckResponse.Types.ServingStatus.Serving
+                        : HealthCheckResponse.Types.ServingStatus.NotServing;
+            }
         }
     }
 }
