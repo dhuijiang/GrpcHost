@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using Grpc.HealthCheck;
+using GrpcHost.Health;
 using GrpcHost.Interceptors;
 using GrpcHost.Logging;
 using GrpcHost.Methods;
@@ -42,12 +44,12 @@ namespace GrpcHost
                         }
                     });
 
-                    configSvc.AddSingleton<ICallContext, CallContext>();
                     configSvc.AddSingleton<CorrelationEnricher>();
+                    configSvc.AddSingleton<ICallContext, CallContext>();
                     configSvc.AddSingleton<ILoggerProvider, SplunkSerilogLoggerProvider>();
                     configSvc.AddSingleton<ILogger, Logger<T>>();
 
-                    configSvc.AddSingleton<ExtendedHealthServiceImpl>();
+                    configSvc.AddSingleton<HealthServiceImpl, ExtendedHealthServiceImpl>();
                     configSvc.AddSingleton<GlobalInterceptor>();
                     configSvc.AddSingleton<GrpcServer>();
 

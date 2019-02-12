@@ -7,6 +7,8 @@ using GrpcHost.Interceptors;
 using GrpcHost.Methods;
 using Microsoft.Extensions.Options;
 
+using GrpcHealth = Grpc.Health.V1.Health;
+
 namespace GrpcHost
 {
     // This supports only one global interceptor, a better solution is needed.
@@ -14,10 +16,10 @@ namespace GrpcHost
     {
         private readonly HostOptions _options;
         private readonly IEnumerable<IMethodContext> _contexts;
-        private readonly ExtendedHealthServiceImpl _healthService;
+        private readonly HealthServiceImpl _healthService;
         private readonly GlobalInterceptor _globalInterceptor;
 
-        public GrpcServer(IOptions<HostOptions> options, ExtendedHealthServiceImpl healthService, GlobalInterceptor globalInterceptor)
+        public GrpcServer(IOptions<HostOptions> options, HealthServiceImpl healthService, GlobalInterceptor globalInterceptor)
         {
             _options = options.Value ?? new HostOptions();
             _contexts = options.Value.RegisteredMethods;
@@ -37,7 +39,7 @@ namespace GrpcHost
                 _healthService.SetStatus(context.GetServiceName(), HealthCheckResponse.Types.ServingStatus.Serving);
             }
 
-            Services.Add(Health.BindService(_healthService));
+            Services.Add(GrpcHealth.BindService(_healthService));
 
             base.Start();
         }

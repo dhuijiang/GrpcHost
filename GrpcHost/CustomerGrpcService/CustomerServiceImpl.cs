@@ -25,7 +25,7 @@ namespace CustomerGrpcService
             var client = new Contracts.CustomerService.CustomerServiceClient(new Channel("localhost:5000", ChannelCredentials.Insecure));
             await client.DeleteCustomerByIdAsync(new DeleteCustomerByIdRequest { Id = request.Id }).ResponseAsync.ConfigureAwait(false);
 
-            var customerEntity = await _customerService.GetById(request.Id);
+            var customerEntity = await _customerService.GetById(request.Id).ConfigureAwait(false);
 
             return new GetCustomerByIdResponse
             {

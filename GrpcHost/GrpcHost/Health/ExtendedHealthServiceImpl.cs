@@ -3,7 +3,7 @@ using Grpc.Core;
 using Grpc.Health.V1;
 using Grpc.HealthCheck;
 
-namespace GrpcHost
+namespace GrpcHost.Health
 {
     /// <summary>
     /// Represents the class that overrides the behavior of <see cref="Health.HealthBase.Check(HealthCheckRequest, ServerCallContext)".

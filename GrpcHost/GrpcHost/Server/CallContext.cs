@@ -17,7 +17,18 @@ namespace GrpcHost.Server
     internal class CallContext : ICallContext
     {
         private const string HeaderName = "correlation-id";
-        private static readonly AsyncLocal<string> _id = new AsyncLocal<string>();
+        private readonly AsyncLocal<string> _id;
+
+        public CallContext()
+        {
+            _id = new AsyncLocal<string>(OnValueChanged);
+        }
+
+        private static void OnValueChanged(AsyncLocalValueChangedArgs<string> obj)
+        {
+
+        }
+
         private string _methodName;
 
         public string GetCorrelationId()
@@ -40,18 +51,18 @@ namespace GrpcHost.Server
             if (!string.IsNullOrWhiteSpace(_id.Value))
                 throw new ArgumentException("Correlation Id is already initialized.");
 
-            var correlationId = context.RequestHeaders.FirstOrDefault(x => x.Key == "correlation-id");
+            var correlationId = context.RequestHeaders.FirstOrDefault(x => x.Key == HeaderName);
 
-            if(correlationid == null)
+            if (correlationId == null)
             {
-                Id.Value = Random().ToString("x");
-                context.RequestHeaders.Add(HeaderName, Id.Value);
+                _id.Value = Random().ToString("x");
+                context.RequestHeaders.Add(HeaderName, _id.Value);
             }
 
-            if(string.IsNullOrWhiteSpace(Id.Value))
-                Id.Value = correlationid.Value;
+            if (string.IsNullOrWhiteSpace(_id.Value))
+                _id.Value = correlationId.Value;
         }
-        
+
         private static ulong Random()
         {
             var guid = Guid.Parse(Guid.NewGuid().ToString());

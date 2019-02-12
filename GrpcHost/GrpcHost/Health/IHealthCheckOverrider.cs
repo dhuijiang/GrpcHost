@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace GrpcHost.Server
+namespace GrpcHost.Health
 {
     public interface IHealthCheckOverrider
     {

@@ -20,7 +20,9 @@ namespace GrpcClient
             Console.WriteLine($"CustomerService is: {healthResponse.Status}");
 
             var customerClient = new CustomerService.CustomerServiceClient(channel);
-            var customerResponse = await customerClient.GetCustomerByIdAsync(new GetCustomerByIdRequest { Id = 1 }, new CallOptions(new Metadata { {"correlation-id", Guid.NewGuid().ToString() } }));
+            var customerResponse = await customerClient.GetCustomerByIdAsync(
+                new GetCustomerByIdRequest { Id = 1 }, 
+                new CallOptions(new Metadata { {"correlation-id", Guid.NewGuid().ToString() } })).ResponseAsync.ConfigureAwait(false);
             Console.WriteLine($"Customer: {customerResponse.Customer.Id} retrieved.");
 
             //var customerResponse2 = customerClient.DeleteCustomerById(new DeleteCustomerByIdRequest { Id = 1 });
