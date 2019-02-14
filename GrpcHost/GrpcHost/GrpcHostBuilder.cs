@@ -44,6 +44,7 @@ namespace GrpcHost
                         }
                     });
 
+                    configSvc.AddSingleton<IClientFactory, ClientFactory>();
                     configSvc.AddSingleton<CorrelationEnricher>();
                     configSvc.AddSingleton<ICallContext, CallContext>();
                     configSvc.AddSingleton<ILoggerProvider, SplunkSerilogLoggerProvider>();

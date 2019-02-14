@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Contracts\Contracts.csproj" />
+    <ProjectReference Include="..\GrpcHost\GrpcHost.csproj" />
     <ProjectReference Include="..\Services\Services.csproj" />
   </ItemGroup>
 

@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
 using Grpc.Core;
@@ -51,7 +48,7 @@ namespace GrpcHost.Methods
 
             var builder = ServerServiceDefinition.CreateBuilder();
 
-            switch(methodType)
+            switch (methodType)
             {
                 case MethodType.Unary:
                     builder.AddMethod(method, CreateGrpcDelegate<UnaryServerMethod<TRequest, TResponse>>(_instance, descriptor.Name));
@@ -73,7 +70,7 @@ namespace GrpcHost.Methods
 
             var definition = builder.Build();
 
-            if(_interceptors == null)
+            if (_interceptors == null)
                 return definition;
 
             return definition.Intercept(_interceptors);
@@ -91,7 +88,7 @@ namespace GrpcHost.Methods
             var serviceDescriptor = ServiceDescriptor.Value;
             var methodDescriptor = serviceDescriptor.Methods.FirstOrDefault(x => x.InputType.ClrType == typeof(TRequest) && x.OutputType.ClrType == typeof(TResponse));
 
-            if(methodDescriptor == null)
+            if (methodDescriptor == null)
                 throw new ArgumentException($"Method descriptor for: {typeof(TRequest).Name} and {typeof(TResponse).Name} couldn't be resolved.");
 
             return methodDescriptor;
@@ -110,7 +107,7 @@ namespace GrpcHost.Methods
             {
                 var baseType = type;
 
-                if(!baseType.BaseType.Equals(typeof(object)))
+                if (!baseType.BaseType.Equals(typeof(object)))
                     return GetBaseType(baseType.BaseType);
 
                 return baseType;
@@ -142,13 +139,13 @@ namespace GrpcHost.Methods
         {
             _ = descriptor ?? throw new ArgumentNullException(nameof(descriptor));
 
-            if(descriptor.IsClientStreaming && descriptor.IsServerStreaming)
+            if (descriptor.IsClientStreaming && descriptor.IsServerStreaming)
                 return MethodType.DuplexStreaming;
 
-            if(descriptor.IsClientStreaming)
+            if (descriptor.IsClientStreaming)
                 return MethodType.ClientStreaming;
 
-            if(descriptor.IsServerStreaming)
+            if (descriptor.IsServerStreaming)
                 return MethodType.ServerStreaming;
 
             return MethodType.Unary;

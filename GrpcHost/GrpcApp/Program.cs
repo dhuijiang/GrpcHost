@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Contracts;
 using CustomerGrpcService;
 using GrpcHost;
-using GrpcHost.Interceptors;
 using GrpcHost.Methods;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -42,7 +41,7 @@ namespace GrpcServer
                             new MethodContext<GetProductsForCustomerRequest, GetProductsForCustomerResponse, ProductServiceImpl>(
                                 ActivatorUtilities.GetServiceOrCreateInstance<ProductServiceImpl>(x)));
                 })
-                .RunAsync();
+                .RunAsync().ConfigureAwait(false);
         }
     }
 }

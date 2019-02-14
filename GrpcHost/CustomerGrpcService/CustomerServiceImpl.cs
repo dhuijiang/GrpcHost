@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Contracts;
 using Grpc.Core;
+using GrpcHost.Server;
 using Services;
 
 namespace CustomerGrpcService
@@ -9,10 +10,12 @@ namespace CustomerGrpcService
     public class CustomerServiceImpl : Contracts.CustomerService.CustomerServiceBase
     {
         private readonly ICustomerService _customerService;
+        private readonly IClientFactory _clientFactory;
 
-        public CustomerServiceImpl(ICustomerService customerService)
+        public CustomerServiceImpl(ICustomerService customerService, IClientFactory clientFactory)
         {
             _customerService = customerService;
+            _clientFactory = clientFactory;
         }
 
         public override Task<DeleteCustomerByIdResponse> DeleteCustomerById(DeleteCustomerByIdRequest request, ServerCallContext context)
@@ -22,7 +25,7 @@ namespace CustomerGrpcService
 
         public override async Task<GetCustomerByIdResponse> GetCustomerById(GetCustomerByIdRequest request, ServerCallContext context)
         {
-            var client = new Contracts.CustomerService.CustomerServiceClient(new Channel("localhost:5000", ChannelCredentials.Insecure));
+            var client = _clientFactory.GetOrAd<Contracts.CustomerService.CustomerServiceClient>("CustomerService");
             await client.DeleteCustomerByIdAsync(new DeleteCustomerByIdRequest { Id = request.Id }).ResponseAsync.ConfigureAwait(false);
 
             var customerEntity = await _customerService.GetById(request.Id).ConfigureAwait(false);
@@ -42,7 +45,7 @@ namespace CustomerGrpcService
         {
             var customers = new List<Customer> { new Customer(), new Customer() };
 
-            foreach(var customer in customers)
+            foreach (var customer in customers)
             {
                 await responseStream.WriteAsync(customer);
             }

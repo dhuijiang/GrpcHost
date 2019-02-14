@@ -11,34 +11,21 @@ namespace GrpcHost.Server
 
         string GetCorrelationId();
 
+        (string name, string value) CreateCorrelationHeader();
+
         string GetMethodName();
     }
 
     internal class CallContext : ICallContext
     {
         private const string HeaderName = "correlation-id";
-        private readonly AsyncLocal<string> _id;
-
-        public CallContext()
-        {
-            _id = new AsyncLocal<string>(OnValueChanged);
-        }
-
-        private static void OnValueChanged(AsyncLocalValueChangedArgs<string> obj)
-        {
-
-        }
+        private static readonly AsyncLocal<string> _id = new AsyncLocal<string>();
 
         private string _methodName;
 
-        public string GetCorrelationId()
+        public CallContext()
         {
-            return _id.Value;
-        }
 
-        public string GetMethodName()
-        {
-            return _methodName;
         }
 
         public void RegisterCorellationId(ServerCallContext context)
@@ -62,6 +49,23 @@ namespace GrpcHost.Server
             if (string.IsNullOrWhiteSpace(_id.Value))
                 _id.Value = correlationId.Value;
         }
+
+        public (string, string) CreateCorrelationHeader()
+        {
+            return (HeaderName, GetCorrelationId());
+        }
+
+        public string GetCorrelationId()
+        {
+            return _id.Value;
+        }
+
+        public string GetMethodName()
+        {
+            return _methodName;
+        }
+
+        
 
         private static ulong Random()
         {
