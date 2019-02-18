@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using GrpcHost.Methods;
+﻿using System.Collections.ObjectModel;
 using Microsoft.Extensions.Logging;
 
 namespace GrpcHost
@@ -21,8 +18,6 @@ namespace GrpcHost
         public string Host { get; set; } = "0.0.0.0";
 
         public int Port { get; set; } = 80;
-
-        public IEnumerable<IMethodContext> RegisteredMethods { get; internal set; } = Enumerable.Empty<IMethodContext>();
     }
 
     public class LoggingOptions

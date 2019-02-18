@@ -12,28 +12,17 @@ namespace GrpcHost.Server
         string GetCorrelationId();
 
         (string name, string value) CreateCorrelationHeader();
-
-        string GetMethodName();
     }
 
     internal class CallContext : ICallContext
     {
         private const string HeaderName = "correlation-id";
-        private static readonly AsyncLocal<string> _id = new AsyncLocal<string>();
-
-        private string _methodName;
-
-        public CallContext()
-        {
-
-        }
+        private readonly AsyncLocal<string> _id = new AsyncLocal<string>();
 
         public void RegisterCorellationId(ServerCallContext context)
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
-
-            _methodName = context.Method;
 
             if (!string.IsNullOrWhiteSpace(_id.Value))
                 throw new ArgumentException("Correlation Id is already initialized.");
@@ -59,13 +48,6 @@ namespace GrpcHost.Server
         {
             return _id.Value;
         }
-
-        public string GetMethodName()
-        {
-            return _methodName;
-        }
-
-        
 
         private static ulong Random()
         {

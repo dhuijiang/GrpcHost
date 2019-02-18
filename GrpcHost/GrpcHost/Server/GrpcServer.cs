@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Grpc.Core;
 using Grpc.Core.Interceptors;
 using Grpc.Health.V1;
 using Grpc.HealthCheck;
 using GrpcHost.Interceptors;
 using GrpcHost.Methods;
+using GrpcHost.Server;
 using Microsoft.Extensions.Options;
 
 using GrpcHealth = Grpc.Health.V1.Health;
@@ -19,10 +21,10 @@ namespace GrpcHost
         private readonly HealthServiceImpl _healthService;
         private readonly GlobalInterceptor _globalInterceptor;
 
-        public GrpcServer(IOptions<HostOptions> options, HealthServiceImpl healthService, GlobalInterceptor globalInterceptor)
+        public GrpcServer(IOptions<HostOptions> options, HealthServiceImpl healthService, GlobalInterceptor globalInterceptor, MethodRegistry methodRegistry)
         {
             _options = options.Value ?? new HostOptions();
-            _contexts = options.Value.RegisteredMethods;
+            _contexts = methodRegistry == null ? Enumerable.Empty<IMethodContext>() : methodRegistry.RegisteredMethods;
             _healthService = healthService;
             _globalInterceptor = globalInterceptor;
         }

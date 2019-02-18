@@ -21,25 +21,17 @@ namespace GrpcServer
                     svcs.AddSingleton<HttpClient>();
                     svcs.AddTransient<ICustomerService, Services.CustomerService>();
 
-                    svcs.AddSingleton<IMethodContext>(
-                        x =>
-                            new MethodContext<GetCustomerByIdRequest, GetCustomerByIdResponse, CustomerServiceImpl>(
-                                ActivatorUtilities.GetServiceOrCreateInstance<CustomerServiceImpl>(x)));
+                    svcs.AddSingleton<CustomerServiceImpl>();
+                    svcs.AddSingleton<ProductServiceImpl>();
 
-                    svcs.AddSingleton<IMethodContext>(
-                        x =>
-                            new MethodContext<DeleteCustomerByIdRequest, DeleteCustomerByIdResponse, CustomerServiceImpl>(
-                                ActivatorUtilities.GetServiceOrCreateInstance<CustomerServiceImpl>(x)));
+                    svcs.AddSingleton<IMethodContext>(x =>
+                    new MethodContext<GetCustomerByIdRequest, GetCustomerByIdResponse, CustomerServiceImpl>(
+                        ActivatorUtilities.GetServiceOrCreateInstance<CustomerServiceImpl>(x),
+                        ActivatorUtilities.GetServiceOrCreateInstance<MyInterceptor>(x)));
 
-                    svcs.AddSingleton<IMethodContext>(
-                        x =>
-                            new MethodContext<CustomerSearch, Customer, CustomerServiceImpl>(
-                                ActivatorUtilities.GetServiceOrCreateInstance<CustomerServiceImpl>(x)));
-
-                    svcs.AddSingleton<IMethodContext>(
-                        x =>
-                            new MethodContext<GetProductsForCustomerRequest, GetProductsForCustomerResponse, ProductServiceImpl>(
-                                ActivatorUtilities.GetServiceOrCreateInstance<ProductServiceImpl>(x)));
+                    svcs.AddSingleton<IMethodContext, MethodContext<DeleteCustomerByIdRequest, DeleteCustomerByIdResponse, CustomerServiceImpl>>();
+                    svcs.AddSingleton<IMethodContext, MethodContext<CustomerSearch, Customer, CustomerServiceImpl>>();
+                    svcs.AddSingleton<IMethodContext, MethodContext<GetProductsForCustomerRequest, GetProductsForCustomerResponse, ProductServiceImpl>>();
                 })
                 .RunAsync().ConfigureAwait(false);
         }

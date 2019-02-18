@@ -35,24 +35,17 @@ namespace GrpcHost
                     configSvc.Configure<LoggingOptions>(hostContext.Configuration.GetSection("LoggingOptions"));
                     configSvc.Configure<HostOptions>(hostContext.Configuration.GetSection("HostOptions"));
 
-                    // TODO: Try and refactor this to something better
-                    configSvc.Configure<HostOptions>(x =>
-                    {
-                        using (var provider = configSvc.BuildServiceProvider())
-                        {
-                            x.RegisteredMethods = provider.GetServices<IMethodContext>();
-                        }
-                    });
-
-                    configSvc.AddSingleton<IClientFactory, ClientFactory>();
-                    configSvc.AddSingleton<CorrelationEnricher>();
                     configSvc.AddSingleton<ICallContext, CallContext>();
+                    configSvc.AddSingleton<IClientFactory, ClientFactory>();
+
+                    configSvc.AddSingleton<CorrelationEnricher>();
                     configSvc.AddSingleton<ILoggerProvider, SplunkSerilogLoggerProvider>();
                     configSvc.AddSingleton<ILogger, Logger<T>>();
 
                     configSvc.AddSingleton<HealthServiceImpl, ExtendedHealthServiceImpl>();
                     configSvc.AddSingleton<GlobalInterceptor>();
                     configSvc.AddSingleton<GrpcServer>();
+                    configSvc.AddSingleton(x => new MethodRegistry { RegisteredMethods = x.GetServices<IMethodContext>() });
 
                     configSvc.AddHostedService<GrpcHostedService>();
                 })
