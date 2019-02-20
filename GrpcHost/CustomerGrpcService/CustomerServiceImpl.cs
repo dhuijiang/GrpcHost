@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Contracts;
 using Grpc.Core;
-using GrpcHost.Server;
+using GrpcHost.Core;
 using Services;
 
 namespace CustomerGrpcService

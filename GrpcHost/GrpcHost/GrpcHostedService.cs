@@ -6,7 +6,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Grpc.Core.Logging;
-using GrpcHost;
+using GrpcHost.Core;
+using GrpcHost.Instrumentation.Logging;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using GrpcLogLevel = Grpc.Core.Logging.LogLevel;
@@ -22,7 +23,7 @@ namespace Techsson.Gaming.Infrastructure.Grpc.Host
 
         private readonly IApplicationLifetime _applicationLifetime;
         private readonly Microsoft.Extensions.Logging.ILogger _logger;
-        private GrpcServer _server;
+        private readonly GrpcServer _server;
 
         /// <summary>
         /// Initializes new instance of <see cref="GrpcHostedService"/>
@@ -31,15 +32,15 @@ namespace Techsson.Gaming.Infrastructure.Grpc.Host
         /// <param name="clientCache" Instance of <see cref="IGrpcClientCache"/>.
         /// <param name="definitions">Dictionary that should contain gRPC service implementation that need to be registered with server.</param>
         /// <param name="applicationLifetime">Instance of <see cref="IApplicationLifetime"/>.</param>
-        /// <param name="logger">Instance of <see cref="ILogger"/> that will be configured to use Serilog Splunk of Console sink.</param>
+        /// <param name="logger">Instance of <see cref="ILogger"/> that will be configured to use Serilog Splunk or Console sink.</param>
         public GrpcHostedService(
-            GrpcServer server,
             IApplicationLifetime applicationLifetime,
+            GrpcServer server,
             Microsoft.Extensions.Logging.ILogger logger)
         {
-            _server = server;
-            _applicationLifetime = applicationLifetime;
-            _logger = logger;
+            _applicationLifetime = applicationLifetime ?? throw new ArgumentNullException(nameof(applicationLifetime));
+            _server = server ?? throw new ArgumentNullException(nameof(server));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public Task StartAsync(CancellationToken cancellationToken)

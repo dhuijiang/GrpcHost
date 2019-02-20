@@ -8,7 +8,7 @@ namespace GrpcHost.Health
     /// <summary>
     /// Represents the class that overrides the behavior of <see cref="Health.HealthBase.Check(HealthCheckRequest, ServerCallContext)".
     /// </summary>
-    public sealed class ExtendedHealthServiceImpl : HealthServiceImpl
+    internal sealed class ExtendedHealthServiceImpl : HealthServiceImpl
     {
         private readonly IHealthCheckOverrider _overrider;
 

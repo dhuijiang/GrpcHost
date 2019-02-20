@@ -5,19 +5,9 @@ namespace GrpcHost
 {
     public class HostOptions
     {
-        public HostOptions()
-        {
-        }
+        public string Host { get; set; }
 
-        public HostOptions(string[] args)
-        {
-            Host = args.Length >= 1 ? args[0] : Host;
-            Port = args.Length >= 2 ? int.Parse(args[1]) : Port;
-        }
-
-        public string Host { get; set; } = "0.0.0.0";
-
-        public int Port { get; set; } = 80;
+        public int Port { get; set; }
     }
 
     public class LoggingOptions
@@ -43,5 +33,14 @@ namespace GrpcHost
 
             public Collection<string> PropertyNames { get; set; } = new Collection<string>();
         }
+    }
+
+    public class ChannelOptions
+    {
+        public string ServiceName { get; set; }
+
+        public string Host { get; set; }
+
+        public int Port { get; set; }
     }
 }

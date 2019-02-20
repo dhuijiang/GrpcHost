@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using IGrpcLogger = Grpc.Core.Logging.ILogger;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
-namespace GrpcHost
+namespace GrpcHost.Instrumentation.Logging
 {
     internal class GrpcLogger : IGrpcLogger
     {

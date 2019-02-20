@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.IO;
 using Grpc.HealthCheck;
+using GrpcHost.Core;
+using GrpcHost.Core.Interceptors;
 using GrpcHost.Health;
-using GrpcHost.Interceptors;
-using GrpcHost.Logging;
-using GrpcHost.Methods;
-using GrpcHost.Server;
+using GrpcHost.Instrumentation;
+using GrpcHost.Instrumentation.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -34,8 +35,9 @@ namespace GrpcHost
                 {
                     configSvc.Configure<LoggingOptions>(hostContext.Configuration.GetSection("LoggingOptions"));
                     configSvc.Configure<HostOptions>(hostContext.Configuration.GetSection("HostOptions"));
+                    configSvc.Configure<Collection<ChannelOptions>>(hostContext.Configuration.GetSection("ChannelOptions"));
 
-                    configSvc.AddSingleton<ICallContext, CallContext>();
+                    configSvc.AddSingleton<ICorrelationContext, CorrelationContext>();
                     configSvc.AddSingleton<IClientFactory, ClientFactory>();
 
                     configSvc.AddSingleton<CorrelationEnricher>();

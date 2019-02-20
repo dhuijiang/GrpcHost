@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Contracts;
 using CustomerGrpcService;
 using GrpcHost;
-using GrpcHost.Methods;
+using GrpcHost.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ProductGrpcService;

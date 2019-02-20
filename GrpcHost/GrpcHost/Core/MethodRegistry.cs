@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using GrpcHost.Methods;
 
-namespace GrpcHost.Server
+namespace GrpcHost.Core
 {
     internal class MethodRegistry
     {
+        public static MethodRegistry Empty => new MethodRegistry();
+
         public IEnumerable<IMethodContext> RegisteredMethods { get; internal set; } = Enumerable.Empty<IMethodContext>();
     }
 }

@@ -1,15 +1,14 @@
 ﻿using System;
-using GrpcHost.Server;
 using Serilog.Core;
 using Serilog.Events;
 
-namespace GrpcHost.Logging
+namespace GrpcHost.Instrumentation.Logging
 {
     internal class CorrelationEnricher : ILogEventEnricher
     {
-        private readonly ICallContext _context;
+        private readonly ICorrelationContext _context;
 
-        public CorrelationEnricher(ICallContext context)
+        public CorrelationEnricher(ICorrelationContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }

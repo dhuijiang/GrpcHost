@@ -3,9 +3,9 @@ using System.Linq;
 using System.Threading;
 using Grpc.Core;
 
-namespace GrpcHost.Server
+namespace GrpcHost.Instrumentation
 {
-    internal interface ICallContext
+    public interface ICorrelationContext
     {
         void RegisterCorellationId(ServerCallContext context);
 
@@ -14,15 +14,14 @@ namespace GrpcHost.Server
         (string name, string value) CreateCorrelationHeader();
     }
 
-    internal class CallContext : ICallContext
+    internal class CorrelationContext : ICorrelationContext
     {
         private const string HeaderName = "correlation-id";
         private readonly AsyncLocal<string> _id = new AsyncLocal<string>();
 
         public void RegisterCorellationId(ServerCallContext context)
         {
-            if (context == null)
-                throw new ArgumentNullException(nameof(context));
+            _ = context ?? throw new ArgumentNullException(nameof(context));
 
             if (!string.IsNullOrWhiteSpace(_id.Value))
                 throw new ArgumentException("Correlation Id is already initialized.");

@@ -1,12 +1,13 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Serilog;
+using Serilog.Core;
 using Serilog.Events;
 using Serilog.Extensions.Logging;
 using Serilog.Formatting.Json;
 using ISeriLogger = Serilog.ILogger;
 
-namespace GrpcHost.Logging
+namespace GrpcHost.Instrumentation.Logging
 {
     internal class SplunkSerilogLoggerProvider : SerilogLoggerProvider
     {
@@ -19,7 +20,7 @@ namespace GrpcHost.Logging
         {
             var config =
                 new LoggerConfiguration()
-                    .MinimumLevel.Is(minimulLogLevel)
+                    .MinimumLevel.ControlledBy(new LoggingLevelSwitch(minimulLogLevel))
                     .Enrich.With(correlationEnricher);
 
             ISeriLogger logger = ConfigureSerilogConsole();

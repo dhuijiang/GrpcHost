@@ -25,5 +25,18 @@
   "HostOptions": {
     "Host": "localhost",
     "Port": 5000
-  }
+  },
+
+  "ChannelOptions": [
+    {
+      "ServiceName": "CustomerService",
+      "Host": "localhost",
+      "Port": 5000
+    },
+    {
+      "ServiceName": "ProductService",
+      "Host": "localhost",
+      "Port": 5005
+    }
+  ]
 }

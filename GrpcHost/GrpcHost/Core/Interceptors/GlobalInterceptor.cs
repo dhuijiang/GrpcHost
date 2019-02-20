@@ -5,24 +5,24 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Grpc.Core.Interceptors;
-using GrpcHost.Server;
+using GrpcHost.Instrumentation;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
-namespace GrpcHost.Interceptors
+namespace GrpcHost.Core.Interceptors
 {
     // Note: When chaining the interceptors (usually: Program.cs of gRPC service project) the last in the chain will be executed first - mime01
     internal class GlobalInterceptor : Interceptor
     {
         private readonly ILogger _logger;
         private readonly LoggingOptions _options;
-        private readonly ICallContext _callContext;
+        private readonly ICorrelationContext _callContext;
 
         public GlobalInterceptor(
             ILogger logger,
             IOptionsMonitor<LoggingOptions> options,
-            ICallContext callContext)
+            ICorrelationContext callContext)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _options = options.CurrentValue ?? new LoggingOptions();

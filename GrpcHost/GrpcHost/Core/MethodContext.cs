@@ -6,7 +6,7 @@ using Grpc.Core;
 using Grpc.Core.Interceptors;
 using ServiceDescriptor = Google.Protobuf.Reflection.ServiceDescriptor;
 
-namespace GrpcHost.Methods
+namespace GrpcHost.Core
 {
     public interface IMethodContext
     {
@@ -14,7 +14,7 @@ namespace GrpcHost.Methods
         ServerServiceDefinition GetDefinition();
     }
 
-    public class MethodContext<TRequest, TResponse, TServiceImpl> : IMethodContext
+    public sealed class MethodContext<TRequest, TResponse, TServiceImpl> : IMethodContext
         where TRequest : class
         where TResponse : class
     {
@@ -33,7 +33,6 @@ namespace GrpcHost.Methods
             _instance = instance;
             _interceptors = interceptors;
         }
-
 
         public string GetServiceName()
         {
