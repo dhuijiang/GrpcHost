@@ -9,6 +9,8 @@ using GrpcHost.Instrumentation;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using OpenTracing;
+using OpenTracing.Tag;
 
 namespace GrpcHost.Core.Interceptors
 {
@@ -18,15 +20,18 @@ namespace GrpcHost.Core.Interceptors
         private readonly ILogger _logger;
         private readonly LoggingOptions _options;
         private readonly ICorrelationContext _callContext;
+        private readonly ITracer _tracer;
 
         public GlobalInterceptor(
             ILogger logger,
             IOptionsMonitor<LoggingOptions> options,
-            ICorrelationContext callContext)
+            ICorrelationContext callContext,
+            ITracer tracer)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _options = options.CurrentValue ?? new LoggingOptions();
             _callContext = callContext ?? throw new ArgumentNullException(nameof(callContext));
+            _tracer = tracer ?? throw new ArgumentNullException(nameof(tracer));
         }
 
         public override async Task<TResponse> UnaryServerHandler<TRequest, TResponse>(
@@ -42,7 +47,10 @@ namespace GrpcHost.Core.Interceptors
 
             try
             {
-                response = await base.UnaryServerHandler(request, context, continuation).ConfigureAwait(false);
+                using (IScope scope = _tracer.BuildSpan(context.Method).WithTag(new StringTag("CorrelationId"), _callContext.GetCorrelationId()).StartActive(finishSpanOnDispose: true))
+                {
+                    response = await base.UnaryServerHandler(request, context, continuation).ConfigureAwait(false);
+                }
             }
             catch (Exception ex)
             {

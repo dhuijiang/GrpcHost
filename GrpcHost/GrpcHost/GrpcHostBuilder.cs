@@ -7,10 +7,15 @@ using GrpcHost.Core.Interceptors;
 using GrpcHost.Health;
 using GrpcHost.Instrumentation;
 using GrpcHost.Instrumentation.Logging;
+using Jaeger;
+using Jaeger.Samplers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using OpenTracing;
+using OpenTracing.Contrib.NetCore.CoreFx;
+using OpenTracing.Util;
 using Techsson.Gaming.Infrastructure.Grpc.Host;
 
 namespace GrpcHost
@@ -36,6 +41,10 @@ namespace GrpcHost
                     configSvc.Configure<LoggingOptions>(hostContext.Configuration.GetSection("LoggingOptions"));
                     configSvc.Configure<HostOptions>(hostContext.Configuration.GetSection("HostOptions"));
                     configSvc.Configure<Collection<ChannelOptions>>(hostContext.Configuration.GetSection("ChannelOptions"));
+                    configSvc.Configure<HttpHandlerDiagnosticOptions>(options =>
+                    {
+                        options.IgnorePatterns.Add(x => !x.RequestUri.IsLoopback);
+                    });
 
                     configSvc.AddSingleton<ICorrelationContext, CorrelationContext>();
                     configSvc.AddSingleton<IClientFactory, ClientFactory>();
@@ -50,6 +59,20 @@ namespace GrpcHost
                     configSvc.AddSingleton(x => new MethodRegistry { RegisteredMethods = x.GetServices<IMethodContext>() });
 
                     configSvc.AddHostedService<GrpcHostedService>();
+
+                    configSvc.AddOpenTracing();
+                    configSvc.AddSingleton<ITracer>(serviceProvider =>
+                    {
+                        // This will log to a default localhost installation of Jaeger.
+                        var tracer = new Tracer.Builder("Grpc")
+                            .WithSampler(new ConstSampler(true))
+                            .Build();
+
+                        // Allows code that can't use DI to also access the tracer.
+                        GlobalTracer.Register(tracer);
+
+                        return tracer;
+                    });
                 })
                 .ConfigureServices(configureServices)
                 .UseConsoleLifetime()
