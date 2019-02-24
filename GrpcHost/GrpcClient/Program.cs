@@ -24,6 +24,10 @@ namespace GrpcClient
                 new CallOptions(new Metadata { { "correlation-id", Guid.NewGuid().ToString() } })).ResponseAsync.ConfigureAwait(false);
             Console.WriteLine($"Customer: {customerResponse.Customer.Id} retrieved.");
 
+            customerResponse = await customerClient.GetCustomerById2Async(
+                new GetCustomerByIdRequest { Id = 1 },
+                new CallOptions(new Metadata { { "correlation-id", Guid.NewGuid().ToString() } })).ResponseAsync.ConfigureAwait(false);
+            Console.WriteLine($"Customer: {customerResponse.Customer.Id} retrieved.");
             //var customerResponse2 = customerClient.DeleteCustomerById(new DeleteCustomerByIdRequest { Id = 1 });
 
             //var customerResponse3 = customerClient.ListCustomers(new CustomerSearch { FirstName = "test" });

@@ -26,6 +26,13 @@ namespace Contracts {
         __Marshaller_google_protobuf_GetCustomerByIdRequest,
         __Marshaller_google_protobuf_GetCustomerByIdResponse);
 
+    static readonly grpc::Method<global::Contracts.GetCustomerByIdRequest, global::Contracts.GetCustomerByIdResponse> __Method_GetCustomerById2 = new grpc::Method<global::Contracts.GetCustomerByIdRequest, global::Contracts.GetCustomerByIdResponse>(
+        grpc::MethodType.Unary,
+        __ServiceName,
+        "GetCustomerById2",
+        __Marshaller_google_protobuf_GetCustomerByIdRequest,
+        __Marshaller_google_protobuf_GetCustomerByIdResponse);
+
     static readonly grpc::Method<global::Contracts.DeleteCustomerByIdRequest, global::Contracts.DeleteCustomerByIdResponse> __Method_DeleteCustomerById = new grpc::Method<global::Contracts.DeleteCustomerByIdRequest, global::Contracts.DeleteCustomerByIdResponse>(
         grpc::MethodType.Unary,
         __ServiceName,
@@ -50,6 +57,11 @@ namespace Contracts {
     public abstract partial class CustomerServiceBase
     {
       public virtual global::System.Threading.Tasks.Task<global::Contracts.GetCustomerByIdResponse> GetCustomerById(global::Contracts.GetCustomerByIdRequest request, grpc::ServerCallContext context)
+      {
+        throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
+      }
+
+      public virtual global::System.Threading.Tasks.Task<global::Contracts.GetCustomerByIdResponse> GetCustomerById2(global::Contracts.GetCustomerByIdRequest request, grpc::ServerCallContext context)
       {
         throw new grpc::RpcException(new grpc::Status(grpc::StatusCode.Unimplemented, ""));
       }
@@ -105,6 +117,22 @@ namespace Contracts {
       {
         return CallInvoker.AsyncUnaryCall(__Method_GetCustomerById, null, options, request);
       }
+      public virtual global::Contracts.GetCustomerByIdResponse GetCustomerById2(global::Contracts.GetCustomerByIdRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return GetCustomerById2(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      public virtual global::Contracts.GetCustomerByIdResponse GetCustomerById2(global::Contracts.GetCustomerByIdRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.BlockingUnaryCall(__Method_GetCustomerById2, null, options, request);
+      }
+      public virtual grpc::AsyncUnaryCall<global::Contracts.GetCustomerByIdResponse> GetCustomerById2Async(global::Contracts.GetCustomerByIdRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
+      {
+        return GetCustomerById2Async(request, new grpc::CallOptions(headers, deadline, cancellationToken));
+      }
+      public virtual grpc::AsyncUnaryCall<global::Contracts.GetCustomerByIdResponse> GetCustomerById2Async(global::Contracts.GetCustomerByIdRequest request, grpc::CallOptions options)
+      {
+        return CallInvoker.AsyncUnaryCall(__Method_GetCustomerById2, null, options, request);
+      }
       public virtual global::Contracts.DeleteCustomerByIdResponse DeleteCustomerById(global::Contracts.DeleteCustomerByIdRequest request, grpc::Metadata headers = null, global::System.DateTime? deadline = null, global::System.Threading.CancellationToken cancellationToken = default(global::System.Threading.CancellationToken))
       {
         return DeleteCustomerById(request, new grpc::CallOptions(headers, deadline, cancellationToken));
@@ -142,6 +170,7 @@ namespace Contracts {
     {
       return grpc::ServerServiceDefinition.CreateBuilder()
           .AddMethod(__Method_GetCustomerById, serviceImpl.GetCustomerById)
+          .AddMethod(__Method_GetCustomerById2, serviceImpl.GetCustomerById2)
           .AddMethod(__Method_DeleteCustomerById, serviceImpl.DeleteCustomerById)
           .AddMethod(__Method_ListCustomers, serviceImpl.ListCustomers).Build();
     }
@@ -153,6 +182,7 @@ namespace Contracts {
     public static void BindService(grpc::ServiceBinderBase serviceBinder, CustomerServiceBase serviceImpl)
     {
       serviceBinder.AddMethod(__Method_GetCustomerById, serviceImpl.GetCustomerById);
+      serviceBinder.AddMethod(__Method_GetCustomerById2, serviceImpl.GetCustomerById2);
       serviceBinder.AddMethod(__Method_DeleteCustomerById, serviceImpl.DeleteCustomerById);
       serviceBinder.AddMethod(__Method_ListCustomers, serviceImpl.ListCustomers);
     }

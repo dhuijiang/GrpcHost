@@ -10,8 +10,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using OpenTracing;
-using OpenTracing.Propagation;
-using OpenTracing.Tag;
 
 namespace GrpcHost.Core.Interceptors
 {
@@ -20,19 +18,16 @@ namespace GrpcHost.Core.Interceptors
     {
         private readonly ILogger _logger;
         private readonly LoggingOptions _options;
-        private readonly ICorrelationContext _callContext;
-        private readonly ITracer _tracer;
+        private readonly IInstrumentationContext _instrumentation;
 
         public GlobalInterceptor(
             ILogger logger,
             IOptionsMonitor<LoggingOptions> options,
-            ICorrelationContext callContext,
-            ITracer tracer)
+            IInstrumentationContext instrumentation)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _options = options.CurrentValue ?? new LoggingOptions();
-            _callContext = callContext ?? throw new ArgumentNullException(nameof(callContext));
-            _tracer = tracer ?? throw new ArgumentNullException(nameof(tracer));
+            _instrumentation = instrumentation ?? throw new ArgumentNullException(nameof(instrumentation));
         }
 
         public override async Task<TResponse> UnaryServerHandler<TRequest, TResponse>(
@@ -40,7 +35,7 @@ namespace GrpcHost.Core.Interceptors
             ServerCallContext context,
             UnaryServerMethod<TRequest, TResponse> continuation)
         {
-            _callContext.RegisterCorellationId(context);
+            _instrumentation.RegisterCorellationId(context);
 
             LogContract(request, context.Method, _options.RequestLoggingOptions);
 
@@ -48,7 +43,7 @@ namespace GrpcHost.Core.Interceptors
 
             try
             {
-                using (IScope scope = StartServerSpan(_tracer, context.RequestHeaders.ToDictionary(x => x.Key, x => x.Value), context))
+                using (IScope scope = _instrumentation.CreateServerSpan(context))
                 {
                     response = await base.UnaryServerHandler(request, context, continuation).ConfigureAwait(false);
                 }
@@ -63,31 +58,6 @@ namespace GrpcHost.Core.Interceptors
             LogContract(response, context.Method, _options.ResponseLoggingOptions, false);
 
             return response;
-        }
-
-        private static IScope StartServerSpan(ITracer tracer, IDictionary<string, string> headers, ServerCallContext context)
-        {
-            var operationName = context.Method.Split('/').Last();
-            ISpanBuilder spanBuilder;
-
-            try
-            {
-                ISpanContext parentSpanCtx = tracer.Extract(BuiltinFormats.HttpHeaders, new TextMapExtractAdapter(headers));
-
-                spanBuilder = tracer.BuildSpan(operationName);
-                spanBuilder = parentSpanCtx != null ? spanBuilder.AsChildOf(parentSpanCtx) : spanBuilder;
-            }
-            catch (Exception)
-            {
-                spanBuilder = tracer.BuildSpan(operationName);
-            }
-
-            return 
-                spanBuilder
-                    .WithTag(Tags.SpanKind, Tags.SpanKindServer)
-                    .WithTag(Tags.PeerHostname, context.Host)
-                    .WithTag(Tags.PeerHostIpv4, context.Peer)
-                    .StartActive(true);
         }
 
         private void LogContract<T>(T instance, string methodName, LoggingOptions.TypeLoggingOptions loggingOptions, bool isRequest = true)

@@ -6,9 +6,9 @@ namespace GrpcHost.Instrumentation.Logging
 {
     internal class CorrelationEnricher : ILogEventEnricher
     {
-        private readonly ICorrelationContext _context;
+        private readonly IInstrumentationContext _context;
 
-        public CorrelationEnricher(ICorrelationContext context)
+        public CorrelationEnricher(IInstrumentationContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }

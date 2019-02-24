@@ -41,6 +41,21 @@ namespace CustomerGrpcService
             };
         }
 
+        public override async Task<GetCustomerByIdResponse> GetCustomerById2(GetCustomerByIdRequest request, ServerCallContext context)
+        {
+            var customerEntity = await _customerService.GetById(request.Id).ConfigureAwait(false);
+
+            return new GetCustomerByIdResponse
+            {
+                Customer = new Customer
+                {
+                    Id = customerEntity.Id,
+                    FirstName = customerEntity.FirstName,
+                    LastName = customerEntity.LastName
+                }
+            };
+        }
+
         public override async Task ListCustomers(CustomerSearch request, IServerStreamWriter<Customer> responseStream, ServerCallContext context)
         {
             var customers = new List<Customer> { new Customer(), new Customer() };

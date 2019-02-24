@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
@@ -11,7 +12,7 @@ namespace GrpcHost.Core
     public interface IMethodContext
     {
         string GetServiceName();
-        ServerServiceDefinition GetDefinition();
+        IEnumerable<ServerServiceDefinition> GetDefinitions();
     }
 
     public sealed class MethodContext<TRequest, TResponse, TServiceImpl> : IMethodContext
@@ -19,8 +20,7 @@ namespace GrpcHost.Core
         where TResponse : class
         where TServiceImpl : class
     {
-        private static readonly Lazy<ServiceDescriptor> ServiceDescriptor = new Lazy<ServiceDescriptor>(GetServiceDescriptor);
-        private static readonly Lazy<MethodDescriptor> MethodDescriptor = new Lazy<MethodDescriptor>(GetMethodDescriptor);
+        private readonly Lazy<ServiceDescriptor> ServiceDescriptor = new Lazy<ServiceDescriptor>(GetServiceDescriptor);
 
         private readonly TServiceImpl _instance;
         private readonly Interceptor[] _interceptors;
@@ -40,58 +40,31 @@ namespace GrpcHost.Core
             return ServiceDescriptor.Value.Name;
         }
 
-        public ServerServiceDefinition GetDefinition()
+        public IEnumerable<ServerServiceDefinition> GetDefinitions()
         {
-            var descriptor = MethodDescriptor.Value;
-            var methodType = descriptor.GetMethodType();
-            var method = CreateMethod(descriptor, methodType);
+            var descriptors = GetMethodDescriptors();
 
-            var builder = ServerServiceDefinition.CreateBuilder();
-
-            switch (methodType)
+            foreach (var descriptor in descriptors)
             {
-                case MethodType.Unary:
-                    builder.AddMethod(method, CreateGrpcDelegate<UnaryServerMethod<TRequest, TResponse>>(_instance, descriptor.Name));
-                    break;
+                var methodType = descriptor.GetMethodType();
+                var method = CreateMethod(descriptor, methodType);
 
-                case MethodType.ClientStreaming:
-                    builder.AddMethod(method, CreateGrpcDelegate<ClientStreamingServerMethod<TRequest, TResponse>>(_instance, descriptor.Name));
-                    break;
+                var definition = BuildDefinitions(methodType, method, _instance);
 
-                case MethodType.ServerStreaming:
-                    builder.AddMethod(
-                        method, CreateGrpcDelegate<ServerStreamingServerMethod<TRequest, TResponse>>(_instance, descriptor.Name));
-                    break;
+                if (_interceptors != null)
+                    definition = definition.Intercept(_interceptors);
 
-                case MethodType.DuplexStreaming:
-                    builder.AddMethod(method, CreateGrpcDelegate<DuplexStreamingServerMethod<TRequest, TResponse>>(_instance, descriptor.Name));
-                    break;
+                yield return definition;
             }
 
-            var definition = builder.Build();
-
-            if (_interceptors == null)
-                return definition;
-
-            return definition.Intercept(_interceptors);
-        }
-
-        private static TDelegate CreateGrpcDelegate<TDelegate>(TServiceImpl instance, string methodName) where TDelegate : Delegate
-        {
-            var grpcDelegate = Delegate.CreateDelegate(typeof(TDelegate), instance, methodName);
-
-            return (TDelegate)grpcDelegate;
-        }
-
-        private static MethodDescriptor GetMethodDescriptor()
-        {
-            var serviceDescriptor = ServiceDescriptor.Value;
-            var methodDescriptor = serviceDescriptor.Methods.FirstOrDefault(x => x.InputType.ClrType == typeof(TRequest) && x.OutputType.ClrType == typeof(TResponse));
-
-            if (methodDescriptor == null)
-                throw new ArgumentException($"Method descriptor for: {typeof(TRequest).Name} and {typeof(TResponse).Name} couldn't be resolved.");
-
-            return methodDescriptor;
+            IEnumerable<MethodDescriptor> GetMethodDescriptors()
+            {
+                return
+                    ServiceDescriptor.Value.Methods.Where(
+                        x =>
+                            x.InputType.ClrType == typeof(TRequest) &&
+                            x.OutputType.ClrType == typeof(TResponse));
+            }
         }
 
         private static ServiceDescriptor GetServiceDescriptor()
@@ -116,8 +89,6 @@ namespace GrpcHost.Core
 
         private static Method<TRequest, TResponse> CreateMethod(MethodDescriptor descriptor, MethodType methodType)
         {
-            _ = descriptor ?? throw new ArgumentNullException(nameof(descriptor));
-
             return
                 new Method<TRequest, TResponse>(
                     methodType,
@@ -129,6 +100,40 @@ namespace GrpcHost.Core
             Marshaller<T> CreateMarshaller<T>(MessageParser parser)
             {
                 return Marshallers.Create(x => ((IMessage)x).ToByteArray(), d => (T)parser.ParseFrom(d));
+            }
+        }
+
+        private static ServerServiceDefinition BuildDefinitions(MethodType methodType, Method<TRequest, TResponse> method, TServiceImpl instance)
+        {
+            var builder = ServerServiceDefinition.CreateBuilder();
+
+            switch (methodType)
+            {
+                case MethodType.Unary:
+                    builder.AddMethod(method, CreateGrpcDelegate<UnaryServerMethod<TRequest, TResponse>>());
+                    break;
+
+                case MethodType.ClientStreaming:
+                    builder.AddMethod(method, CreateGrpcDelegate<ClientStreamingServerMethod<TRequest, TResponse>>());
+                    break;
+
+                case MethodType.ServerStreaming:
+                    builder.AddMethod(
+                        method, CreateGrpcDelegate<ServerStreamingServerMethod<TRequest, TResponse>>());
+                    break;
+
+                case MethodType.DuplexStreaming:
+                    builder.AddMethod(method, CreateGrpcDelegate<DuplexStreamingServerMethod<TRequest, TResponse>>());
+                    break;
+            }
+
+            return builder.Build();
+
+            TDelegate CreateGrpcDelegate<TDelegate>() where TDelegate : Delegate
+            {
+                var grpcDelegate = Delegate.CreateDelegate(typeof(TDelegate), instance, method.Name);
+
+                return (TDelegate)grpcDelegate;
             }
         }
     }

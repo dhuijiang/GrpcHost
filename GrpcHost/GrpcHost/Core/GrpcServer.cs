@@ -38,9 +38,12 @@ namespace GrpcHost.Core
 
             foreach (var context in _methodRegistry.RegisteredMethods)
             {
-                Services.Add(context.GetDefinition().Intercept(_globalInterceptor));
+                foreach (var definition in context.GetDefinitions())
+                {
+                    Services.Add(definition.Intercept(_globalInterceptor));
 
-                _healthService.SetStatus(context.GetServiceName(), HealthCheckResponse.Types.ServingStatus.Serving);
+                    _healthService.SetStatus(context.GetServiceName(), HealthCheckResponse.Types.ServingStatus.Serving);
+                }
             }
 
             Services.Add(GrpcHealth.BindService(_healthService));

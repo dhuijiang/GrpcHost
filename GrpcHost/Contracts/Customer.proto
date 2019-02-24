@@ -6,6 +6,7 @@ option csharp_namespace = "Contracts";
 
 service CustomerService { 
 	rpc GetCustomerById(GetCustomerByIdRequest) returns (GetCustomerByIdResponse) { }
+	rpc GetCustomerById2(GetCustomerByIdRequest) returns (GetCustomerByIdResponse) { }
 	rpc DeleteCustomerById(DeleteCustomerByIdRequest) returns (DeleteCustomerByIdResponse) {}
 
 	rpc ListCustomers(CustomerSearch) returns (stream Customer) {}

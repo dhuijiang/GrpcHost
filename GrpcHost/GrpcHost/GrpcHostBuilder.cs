@@ -60,7 +60,6 @@ namespace GrpcHost
                         return tracer;
                     });
 
-                    configSvc.AddSingleton<ICorrelationContext, CorrelationContext>();
                     configSvc.AddSingleton<IInstrumentationContext, InstrumentationContext>();
 
                     configSvc.AddSingleton<CorrelationEnricher>();
