@@ -11,7 +11,7 @@ namespace GrpcHost.Instrumentation.Logging
 
         public GrpcLogger(ILogger logger)
         {
-            _logger = logger;
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public void Debug(string message)

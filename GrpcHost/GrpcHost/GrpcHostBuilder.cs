@@ -46,20 +46,6 @@ namespace GrpcHost
                         options.IgnorePatterns.Add(x => !x.RequestUri.IsLoopback);
                     });
 
-                    configSvc.AddSingleton<ICorrelationContext, CorrelationContext>();
-                    configSvc.AddSingleton<IClientFactory, ClientFactory>();
-
-                    configSvc.AddSingleton<CorrelationEnricher>();
-                    configSvc.AddSingleton<ILoggerProvider, SplunkSerilogLoggerProvider>();
-                    configSvc.AddSingleton<ILogger, Logger<T>>();
-
-                    configSvc.AddSingleton<HealthServiceImpl, ExtendedHealthServiceImpl>();
-                    configSvc.AddSingleton<GlobalInterceptor>();
-                    configSvc.AddSingleton<GrpcServer>();
-                    configSvc.AddSingleton(x => new MethodRegistry { RegisteredMethods = x.GetServices<IMethodContext>() });
-
-                    configSvc.AddHostedService<GrpcHostedService>();
-
                     configSvc.AddOpenTracing();
                     configSvc.AddSingleton<ITracer>(serviceProvider =>
                     {
@@ -73,6 +59,22 @@ namespace GrpcHost
 
                         return tracer;
                     });
+
+                    configSvc.AddSingleton<ICorrelationContext, CorrelationContext>();
+                    configSvc.AddSingleton<IInstrumentationContext, InstrumentationContext>();
+
+                    configSvc.AddSingleton<CorrelationEnricher>();
+                    configSvc.AddSingleton<ILoggerProvider, SplunkSerilogLoggerProvider>();
+                    configSvc.AddSingleton<ILogger, Logger<T>>();
+
+                    configSvc.AddSingleton<IClientFactory, ClientFactory>();
+
+                    configSvc.AddSingleton<HealthServiceImpl, ExtendedHealthServiceImpl>();
+                    configSvc.AddSingleton<GlobalInterceptor>();
+                    configSvc.AddSingleton<GrpcServer>();
+                    configSvc.AddSingleton(x => new MethodRegistry { RegisteredMethods = x.GetServices<IMethodContext>() });
+
+                    configSvc.AddHostedService<GrpcHostedService>();
                 })
                 .ConfigureServices(configureServices)
                 .UseConsoleLifetime()

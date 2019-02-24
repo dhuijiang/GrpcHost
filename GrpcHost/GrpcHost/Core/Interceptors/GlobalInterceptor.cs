@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using OpenTracing;
+using OpenTracing.Propagation;
 using OpenTracing.Tag;
 
 namespace GrpcHost.Core.Interceptors
@@ -47,7 +48,7 @@ namespace GrpcHost.Core.Interceptors
 
             try
             {
-                using (IScope scope = _tracer.BuildSpan(context.Method).WithTag(new StringTag("CorrelationId"), _callContext.GetCorrelationId()).StartActive(finishSpanOnDispose: true))
+                using (IScope scope = StartServerSpan(_tracer, context.RequestHeaders.ToDictionary(x => x.Key, x => x.Value), context))
                 {
                     response = await base.UnaryServerHandler(request, context, continuation).ConfigureAwait(false);
                 }
@@ -64,6 +65,30 @@ namespace GrpcHost.Core.Interceptors
             return response;
         }
 
+        private static IScope StartServerSpan(ITracer tracer, IDictionary<string, string> headers, ServerCallContext context)
+        {
+            var operationName = context.Method.Split('/').Last();
+            ISpanBuilder spanBuilder;
+
+            try
+            {
+                ISpanContext parentSpanCtx = tracer.Extract(BuiltinFormats.HttpHeaders, new TextMapExtractAdapter(headers));
+
+                spanBuilder = tracer.BuildSpan(operationName);
+                spanBuilder = parentSpanCtx != null ? spanBuilder.AsChildOf(parentSpanCtx) : spanBuilder;
+            }
+            catch (Exception)
+            {
+                spanBuilder = tracer.BuildSpan(operationName);
+            }
+
+            return 
+                spanBuilder
+                    .WithTag(Tags.SpanKind, Tags.SpanKindServer)
+                    .WithTag(Tags.PeerHostname, context.Host)
+                    .WithTag(Tags.PeerHostIpv4, context.Peer)
+                    .StartActive(true);
+        }
 
         private void LogContract<T>(T instance, string methodName, LoggingOptions.TypeLoggingOptions loggingOptions, bool isRequest = true)
         {

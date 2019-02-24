@@ -17,6 +17,7 @@ namespace GrpcHost.Core
     public sealed class MethodContext<TRequest, TResponse, TServiceImpl> : IMethodContext
         where TRequest : class
         where TResponse : class
+        where TServiceImpl : class
     {
         private static readonly Lazy<ServiceDescriptor> ServiceDescriptor = new Lazy<ServiceDescriptor>(GetServiceDescriptor);
         private static readonly Lazy<MethodDescriptor> MethodDescriptor = new Lazy<MethodDescriptor>(GetMethodDescriptor);
@@ -30,7 +31,7 @@ namespace GrpcHost.Core
 
         public MethodContext(TServiceImpl instance, params Interceptor[] interceptors)
         {
-            _instance = instance;
+            _instance = instance ?? throw new ArgumentNullException(nameof(instance));
             _interceptors = interceptors;
         }
 

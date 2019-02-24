@@ -18,13 +18,13 @@ namespace GrpcHost.Core
     {
         private readonly ConcurrentDictionary<string, ClientBase> _clientCache = new ConcurrentDictionary<string, ClientBase>();
 
-        private readonly ICorrelationContext _callContext;
+        private readonly IInstrumentationContext _instrumentation;
         private readonly Collection<ChannelOptions> _channelOptions;
 
-        public ClientFactory(IOptions<Collection<ChannelOptions>> channelOptions, ICorrelationContext callContext)
+        public ClientFactory(IOptions<Collection<ChannelOptions>> channelOptions, IInstrumentationContext instrumentation)
         {
             _channelOptions = channelOptions.Value ?? new Collection<ChannelOptions>();
-            _callContext = callContext;
+            _instrumentation = instrumentation ?? throw new ArgumentNullException(nameof(instrumentation));
         }
 
         public T GetOrAd<T>(string name) where T : ClientBase<T>
@@ -43,7 +43,7 @@ namespace GrpcHost.Core
                 throw new ArgumentOutOfRangeException($"Channel: {name} not registered.");
 
             var channel = new Channel($"{options.Host}:{options.Port}", ChannelCredentials.Insecure);
-            var invoker = new GlobalCallInvoker(channel, _callContext);
+            var invoker = new GlobalCallInvoker(channel, _instrumentation);
 
             ClientBase client = (ClientBase)Activator.CreateInstance(typeof(T), new object[] { invoker });
             _clientCache[name] = client;
