@@ -5,6 +5,7 @@ using Google.Protobuf;
 using Google.Protobuf.Reflection;
 using Grpc.Core;
 using Grpc.Core.Interceptors;
+using Microsoft.Extensions.Logging;
 using ServiceDescriptor = Google.Protobuf.Reflection.ServiceDescriptor;
 
 namespace GrpcHost.Core
@@ -23,15 +24,17 @@ namespace GrpcHost.Core
         private readonly Lazy<ServiceDescriptor> ServiceDescriptor = new Lazy<ServiceDescriptor>(GetServiceDescriptor);
 
         private readonly TServiceImpl _instance;
+        private readonly ILogger _logger;
         private readonly Interceptor[] _interceptors;
 
-        public MethodContext(TServiceImpl instance) : this(instance, null)
+        public MethodContext(TServiceImpl instance, ILogger logger) : this(instance, logger, null)
         {
         }
 
-        public MethodContext(TServiceImpl instance, params Interceptor[] interceptors)
+        public MethodContext(TServiceImpl instance, ILogger logger, params Interceptor[] interceptors)
         {
             _instance = instance ?? throw new ArgumentNullException(nameof(instance));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _interceptors = interceptors;
         }
 
@@ -44,12 +47,16 @@ namespace GrpcHost.Core
         {
             var descriptors = GetMethodDescriptors();
 
+            if (!descriptors.Any())
+                throw new IndexOutOfRangeException($"Method with request: {typeof(TRequest).FullName} and response:{typeof(TResponse).FullName} doesn't exist.");
+
             foreach (var descriptor in descriptors)
             {
                 var methodType = descriptor.GetMethodType();
                 var method = CreateMethod(descriptor, methodType);
 
                 var definition = BuildDefinitions(methodType, method, _instance);
+                _logger.LogInformation("Method {grpc-diag-method} registered.", method.FullName);
 
                 if (_interceptors != null)
                     definition = definition.Intercept(_interceptors);
