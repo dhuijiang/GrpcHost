@@ -25,6 +25,7 @@ namespace GrpcHost.Instrumentation
     public sealed class InstrumentationContext : IInstrumentationContext
     {
         private const string HeaderName = "correlation-id";
+
         private readonly AsyncLocal<string> _id = new AsyncLocal<string>();
         private readonly ITracer _tracer;
 

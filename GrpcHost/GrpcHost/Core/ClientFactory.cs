@@ -38,9 +38,7 @@ namespace GrpcHost.Core
         private ClientBase CreateClient<T>(string name)
         {
             var options = _channelOptions.FirstOrDefault(x => x.ServiceName.Equals(name, StringComparison.InvariantCultureIgnoreCase));
-
-            if (options == null)
-                throw new ArgumentOutOfRangeException($"Channel: {name} not registered.");
+            _ = options ?? throw new ArgumentOutOfRangeException($"Channel: {name} not registered.");
 
             var channel = new Channel($"{options.Host}:{options.Port}", ChannelCredentials.Insecure);
             var invoker = new GlobalCallInvoker(channel, _instrumentation);

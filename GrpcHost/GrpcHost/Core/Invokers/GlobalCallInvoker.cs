@@ -35,7 +35,7 @@ namespace GrpcHost.Core.Invokers
 
         public override TResponse BlockingUnaryCall<TRequest, TResponse>(Method<TRequest, TResponse> method, string host, CallOptions options, TRequest request)
         {
-            return base.BlockingUnaryCall(method, host, options.WithCorrelationHeader(_context), request);
+            return base.BlockingUnaryCall(method, host, options.WithCorrelationHeader(_context).WithTraceId(_context), request);
         }
     }
 

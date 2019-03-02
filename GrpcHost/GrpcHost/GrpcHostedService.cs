@@ -49,10 +49,6 @@ namespace Techsson.Gaming.Infrastructure.Grpc.Host
             _applicationLifetime.ApplicationStopping.Register(OnStopping);
 
             GrpcEnvironment.SetLogger(new LogLevelFilterLogger(new GrpcLogger(_logger), GrpcLogLevel.Debug, false));
-            GrpcEnvironment.Logger.Info("Testing gRPC Logger.");
-
-            _logger.LogInformation("Server is starting.", null);
-
             _server.Start();
 
             string serverAddress = _server.Ports.Select(p => string.Format("{0}:{1}", p.Host, p.Port.ToString())).First();

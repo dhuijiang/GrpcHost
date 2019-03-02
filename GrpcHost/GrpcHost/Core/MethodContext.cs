@@ -13,7 +13,7 @@ namespace GrpcHost.Core
     public interface IMethodContext
     {
         string GetServiceName();
-        IEnumerable<ServerServiceDefinition> GetDefinitions();
+        IEnumerable<(string methodName, ServerServiceDefinition defintion)> GetDefinitions();
     }
 
     public sealed class MethodContext<TRequest, TResponse, TServiceImpl> : IMethodContext
@@ -24,17 +24,15 @@ namespace GrpcHost.Core
         private readonly Lazy<ServiceDescriptor> ServiceDescriptor = new Lazy<ServiceDescriptor>(GetServiceDescriptor);
 
         private readonly TServiceImpl _instance;
-        private readonly ILogger _logger;
         private readonly Interceptor[] _interceptors;
 
-        public MethodContext(TServiceImpl instance, ILogger logger) : this(instance, logger, null)
+        public MethodContext(TServiceImpl instance) : this(instance, null)
         {
         }
 
-        public MethodContext(TServiceImpl instance, ILogger logger, params Interceptor[] interceptors)
+        public MethodContext(TServiceImpl instance, params Interceptor[] interceptors)
         {
             _instance = instance ?? throw new ArgumentNullException(nameof(instance));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _interceptors = interceptors;
         }
 
@@ -43,7 +41,7 @@ namespace GrpcHost.Core
             return ServiceDescriptor.Value.Name;
         }
 
-        public IEnumerable<ServerServiceDefinition> GetDefinitions()
+        public IEnumerable<(string, ServerServiceDefinition)> GetDefinitions()
         {
             var descriptors = GetMethodDescriptors();
 
@@ -56,12 +54,11 @@ namespace GrpcHost.Core
                 var method = CreateMethod(descriptor, methodType);
 
                 var definition = BuildDefinitions(methodType, method, _instance);
-                _logger.LogInformation("Method {grpc-diag-method} registered.", method.FullName);
 
-                if (_interceptors != null)
-                    definition = definition.Intercept(_interceptors);
-
-                yield return definition;
+                yield return 
+                    _instance != null 
+                        ? (method.FullName, definition.Intercept(_interceptors)) 
+                        : (method.FullName, definition);
             }
 
             IEnumerable<MethodDescriptor> GetMethodDescriptors()
