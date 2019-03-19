@@ -6,6 +6,7 @@ using Grpc.Core;
 using OpenTracing;
 using OpenTracing.Propagation;
 using OpenTracing.Tag;
+using Techsson.Gaming.Infrastructure.Grpc.Instrumentation.Tracing;
 
 namespace GrpcHost.Instrumentation
 {
@@ -29,9 +30,9 @@ namespace GrpcHost.Instrumentation
         private readonly AsyncLocal<string> _id = new AsyncLocal<string>();
         private readonly ITracer _tracer;
 
-        public InstrumentationContext(ITracer tracer)
+        public InstrumentationContext(ITracerFactory tracerFactory)
         {
-            _tracer = tracer ?? throw new ArgumentNullException(nameof(tracer));
+            _tracer = tracerFactory?.Create(Random().ToString("x")) ?? throw new ArgumentNullException(nameof(tracerFactory));
         }
 
         public void RegisterCorellationId(ServerCallContext context)

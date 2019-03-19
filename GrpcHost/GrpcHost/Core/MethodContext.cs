@@ -55,8 +55,8 @@ namespace GrpcHost.Core
 
                 var definition = BuildDefinitions(methodType, method, _instance);
 
-                yield return 
-                    _instance != null 
+                yield return
+                    _interceptors != null 
                         ? (method.FullName, definition.Intercept(_interceptors)) 
                         : (method.FullName, definition);
             }

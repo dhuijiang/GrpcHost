@@ -27,6 +27,14 @@
     "Port": 5000
   },
 
+  "JaegerOptions": {
+    "ServiceName": "TestGrpcService",
+    "IsUdpSender": "True",
+    "Url": "http://localhost:14268/api/traces",
+    "Host": "localhost",
+    "Port": 6831
+  },
+
   "ChannelOptions": [
     {
       "ServiceName": "CustomerService",
