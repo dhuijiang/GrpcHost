@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using GrpcHost;
 using Jaeger;
 using Jaeger.Reporters;
@@ -13,8 +12,6 @@ namespace Techsson.Gaming.Infrastructure.Grpc.Instrumentation.Tracing
 {
     internal class JaegerTracerFactory : ITracerFactory
     {
-        private readonly ConcurrentDictionary<string, ITracer> _cache = new ConcurrentDictionary<string, ITracer>();
-
         private readonly JaegerOptions _options;
 
         public JaegerTracerFactory(IOptions<JaegerOptions> options)
@@ -22,14 +19,9 @@ namespace Techsson.Gaming.Infrastructure.Grpc.Instrumentation.Tracing
             _options = options.Value ?? throw new ArgumentNullException(nameof(options));
         }
 
-        public ITracer Create(string name)
+        public ITracer Create()
         {
-            if(_cache.ContainsKey(name))
-                return _cache[name];
-
-            _cache[name] = CreateTracer();
-
-            return _cache[name];
+            return CreateTracer();
 
             ITracer CreateTracer()
             {
@@ -42,7 +34,7 @@ namespace Techsson.Gaming.Infrastructure.Grpc.Instrumentation.Tracing
                 GlobalTracer.Register(tracer);
 
                 return tracer;
-                
+
                 ISender CreateSender()
                 {
                     if(_options.IsUdpSender)

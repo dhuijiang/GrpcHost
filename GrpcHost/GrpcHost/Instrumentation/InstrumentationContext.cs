@@ -32,7 +32,8 @@ namespace GrpcHost.Instrumentation
 
         public InstrumentationContext(ITracerFactory tracerFactory)
         {
-            _tracer = tracerFactory?.Create(Random().ToString("x")) ?? throw new ArgumentNullException(nameof(tracerFactory));
+            _ = tracerFactory ?? throw new ArgumentNullException(nameof(tracerFactory));
+            _tracer = tracerFactory.Create();
         }
 
         public void RegisterCorellationId(ServerCallContext context)
@@ -59,7 +60,7 @@ namespace GrpcHost.Instrumentation
             _ = context ?? throw new ArgumentNullException(nameof(context));
 
             var operationName = context.Method.Split('/').Last();
-            ISpanBuilder spanBuilder;
+            ISpanBuilder spanBuilder = null;
 
             try
             {
@@ -69,9 +70,10 @@ namespace GrpcHost.Instrumentation
                 spanBuilder = _tracer.BuildSpan(operationName);
                 spanBuilder = parentSpanCtx != null ? spanBuilder.AsChildOf(parentSpanCtx) : spanBuilder;
             }
-            catch (Exception)
+            finally
             {
-                spanBuilder = _tracer.BuildSpan(operationName);
+                if(spanBuilder == null)
+                    spanBuilder = _tracer.BuildSpan(operationName);
             }
 
             return
