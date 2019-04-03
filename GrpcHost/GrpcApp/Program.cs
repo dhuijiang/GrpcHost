@@ -6,7 +6,6 @@ using GrpcHost;
 using GrpcHost.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using ProductGrpcService;
 using Services;
 

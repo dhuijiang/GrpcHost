@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Contracts;
 using Grpc.Core;
@@ -28,13 +29,13 @@ namespace GrpcClient
                 new GetCustomerByIdRequest { Id = 1 },
                 new CallOptions(new Metadata { { "correlation-id", Guid.NewGuid().ToString() } })).ResponseAsync.ConfigureAwait(false);
             Console.WriteLine($"Customer: {customerResponse.Customer.Id} retrieved.");
-            //var customerResponse2 = customerClient.DeleteCustomerById(new DeleteCustomerByIdRequest { Id = 1 });
+            var customerResponse2 = customerClient.DeleteCustomerById(new DeleteCustomerByIdRequest { Id = 1 });
 
-            //var customerResponse3 = customerClient.ListCustomers(new CustomerSearch { FirstName = "test" });
-            //while(await customerResponse3.ResponseStream.MoveNext(CancellationToken.None))
-            //{
-            //    var response = customerResponse3.ResponseStream.Current;
-            //}
+            var customerResponse3 = customerClient.ListCustomers(new CustomerSearch { FirstName = "test" });
+            while (await customerResponse3.ResponseStream.MoveNext(CancellationToken.None))
+            {
+                var response = customerResponse3.ResponseStream.Current;
+            }
 
             await channel.ShutdownAsync().ConfigureAwait(false);
 

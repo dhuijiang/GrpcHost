@@ -5,7 +5,6 @@ using Google.Protobuf;
 using Google.Protobuf.Reflection;
 using Grpc.Core;
 using Grpc.Core.Interceptors;
-using Microsoft.Extensions.Logging;
 using ServiceDescriptor = Google.Protobuf.Reflection.ServiceDescriptor;
 
 namespace GrpcHost.Core
