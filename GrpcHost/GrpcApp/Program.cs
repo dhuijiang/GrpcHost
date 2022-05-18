@@ -1,4 +1,4 @@
-﻿using System.Net.Http;
+﻿//using System.Net.Http;
 using System.Threading.Tasks;
 using Contracts;
 using CustomerGrpcService;
@@ -6,7 +6,7 @@ using GrpcHost;
 using GrpcHost.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using ProductGrpcService;
+//using ProductGrpcService;
 using Services;
 
 namespace GrpcServer
@@ -18,11 +18,11 @@ namespace GrpcServer
             await
                 GrpcHostBuilder.BuildHost<Program>(args, (ctx, svcs) =>
                 {
-                    svcs.AddSingleton<HttpClient>();
+                    //svcs.AddSingleton<HttpClient>();
                     svcs.AddTransient<ICustomerService, Services.CustomerService>();
 
                     svcs.AddSingleton<CustomerServiceImpl>();
-                    svcs.AddSingleton<ProductServiceImpl>();
+                    //svcs.AddSingleton<ProductServiceImpl>();
 
                     svcs.AddSingleton<IMethodContext>(x =>
                     new MethodContext<GetCustomerByIdRequest, GetCustomerByIdResponse, CustomerServiceImpl>(
@@ -31,7 +31,7 @@ namespace GrpcServer
 
                     svcs.AddSingleton<IMethodContext, MethodContext<DeleteCustomerByIdRequest, DeleteCustomerByIdResponse, CustomerServiceImpl>>();
                     svcs.AddSingleton<IMethodContext, MethodContext<CustomerSearch, Customer, CustomerServiceImpl>>();
-                    svcs.AddSingleton<IMethodContext, MethodContext<GetProductsForCustomerRequest, GetProductsForCustomerResponse, ProductServiceImpl>>();
+                    //svcs.AddSingleton<IMethodContext, MethodContext<GetProductsForCustomerRequest, GetProductsForCustomerResponse, ProductServiceImpl>>();
                 })
                 .RunAsync().ConfigureAwait(false);
         }

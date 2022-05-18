@@ -21,12 +21,12 @@ namespace GrpcClient
 
             var customerClient = new CustomerService.CustomerServiceClient(channel);
             var customerResponse = await customerClient.GetCustomerByIdAsync(
-                new GetCustomerByIdRequest { Id = 1 },
+                new GetCustomerByIdRequest { Id = 123 },
                 new CallOptions(new Metadata { { "correlation-id", Guid.NewGuid().ToString() } })).ResponseAsync.ConfigureAwait(false);
             Console.WriteLine($"Customer: {customerResponse.Customer.Id} retrieved.");
 
             customerResponse = await customerClient.GetCustomerById2Async(
-                new GetCustomerByIdRequest { Id = 1 },
+                new GetCustomerByIdRequest { Id = 213 },
                 new CallOptions(new Metadata { { "correlation-id", Guid.NewGuid().ToString() } })).ResponseAsync.ConfigureAwait(false);
             Console.WriteLine($"Customer: {customerResponse.Customer.Id} retrieved.");
             var customerResponse2 = customerClient.DeleteCustomerById(new DeleteCustomerByIdRequest { Id = 1 });
