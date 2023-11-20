@@ -31,9 +31,10 @@ namespace Techsson.Gaming.Infrastructure.Grpc.Instrumentation.Tracing
                         .WithSampler(new ConstSampler(sample: true))
                         .Build();
 
-                GlobalTracer.Register(tracer);
+                if (!GlobalTracer.IsRegistered())
+                    GlobalTracer.Register(tracer);
 
-                return tracer;
+                return GlobalTracer.Instance;
 
                 ISender CreateSender()
                 {
